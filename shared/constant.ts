@@ -7,7 +7,7 @@ export const NEXT_PUBLIC_S3_PREFIX =
   process.env.NEXT_PUBLIC_S3_PREFIX ||
   'https://clubmatch-media.s3.eu-west-1.amazonaws.com'
 export const NEXT_PUBLIC_API_URL =
-  process.env.NEXT_PUBLIC_API_URL || 'http://52.213.170.31:5200/api/'
+  process.env.NEXT_PUBLIC_API_URL || 'http://52.213.170.31:5100/api/'
 
 // Club website identifier used for published SEO + site settings.
 // Example: "WoburnSands"

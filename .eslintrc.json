@@ -1,0 +1,65 @@
+{
+  // "extends": ["next/core-web-vitals", "plugin:react/recommended", "eslint:recommended", "standard"],
+  "extends": ["plugin:react/recommended", "eslint:recommended", "standard"],
+  "plugins": ["react"],
+  "overrides": [
+    {
+      "env": {
+        "node": true
+      },
+      "files": [".eslintrc.{js,cjs}"],
+      "parserOptions": {
+        "sourceType": "script"
+      }
+    },
+    {
+      "env": {
+        "serviceworker": true
+      },
+      "files": ["public/firebase-messaging-sw.js"]
+    }
+  ],
+  "globals": {
+    "React": "writable",
+    "localStorage": "readonly",
+    "sessionStorage": "readonly",
+    "window": "readonly",
+    "document": "readonly",
+    "IntersectionObserver": "readonly"
+  },
+  "rules": {
+    "quotes": "off",
+    "react/prop-types": 2,
+    "react-hooks/exhaustive-deps": "off",
+    "space-before-function-paren": [
+      "error",
+      {
+        "anonymous": "never",
+        "named": "never",
+        "asyncArrow": "always"
+      }
+    ],
+    "multiline-ternary": ["error", "never"],
+    "react/react-in-jsx-scope": "off",
+    "react/no-unknown-property": [
+      2,
+      {
+        "ignore": [
+          "jsx",
+          "amp-custom",
+          "global",
+          "on",
+          "custom-element",
+          "custom-template",
+          "option",
+          "on",
+          "items",
+          "fallback",
+          "update",
+          "item"
+        ]
+      }
+    ]
+  },
+  "root": true
+}

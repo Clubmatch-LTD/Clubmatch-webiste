@@ -1,0 +1,40 @@
+@use './form.scss';
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+* { box-sizing: border-box; }
+html, body { 
+    @apply overflow-x-clip; 
+    width: 100%; max-width: 100vw; position: relative;
+}
+::-webkit-scrollbar { @apply hidden; }
+
+
+.shadow-1 {
+    text-shadow: 0px 4px 8px rgba(27, 40, 0, 0.32);
+}
+.main-shape::before{
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: url('../images/shape-back.png');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+.main-2-shape::before{
+    content: '';
+    position: absolute;
+    top: 100px;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: url('../images/shape-back.png');
+    background-size: 100% 100%;
+    background-position: center;
+    background-repeat: no-repeat;
+}

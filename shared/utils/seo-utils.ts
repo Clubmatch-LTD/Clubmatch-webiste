@@ -81,8 +81,7 @@ export function isDirectVideoFile(url: unknown): boolean {
   return /\.(mp4|webm|ogg)(\?|$)/i.test(value)
 }
 
-const DEFAULT_VIDEO_URL =
-  'https://test-videos.co.uk/vids/bigbuckbunny/mp4/h264/1080/Big_Buck_Bunny_1080_10s_1MB.mp4'
+const DEFAULT_VIDEO_URL = 'https://www.youtube.com/watch?v=WTD4nLBzbHY'
 
 export function resolveVideoSource(payload?: {
   sVideoUrl?: string

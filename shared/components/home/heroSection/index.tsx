@@ -4,6 +4,12 @@ import logo from '@/assets/images/wstc.svg'
 import ClubMatch from '@/assets/images/club-match.png'
 import { withS3Prefix } from '@/shared/utils/seo-utils'
 
+const DEFAULT_INTRO_DESCRIPTION = `We are part of the clubmatch comunity located in the Bedfordshire village of Woburn Sands.  We have two hard courts that are both floodlit. We also have a fantastic clubhouse where our members can relax and enjoy a social coffee while watching the action on the courts.
+We have regular club sessions on Sundays from 9.30 to 12.30 and Wednesday evenings from 18.00 until 20.00, which all full members are welcome to join.
+Year round coaching is provided by our resident tennis coach James Godber and Tenniskool. As well as 1-1 lessons, we provide adult group coaching, high intensity drill sessions and junior group coaching for all ages and abilities including parent and toddler classes.
+Check out our Facebook and Instagram pages for more details.
+For any Welfare concerns please find our Policies and Welfare Officer within the menu in the top navigation.`
+
 function HeroSection({ 
     homeData,
     bgImage,
@@ -17,9 +23,9 @@ function HeroSection({
     const headerSubTitle = homeData?.oHeader?.sSubtitle || 'Tennis Club'
     const headerBg = withS3Prefix(bgImage) || court
     const clubLogo = withS3Prefix(sClubLogo) || logo
-    const introsTitle = homeData?.aModules[0]?.oPayload?.sTitle || 'Woburn Sands'
-    const introSubTitle = homeData?.aModules[0]?.oPayload?.sSubtitle || 'Tennis Club'
-    const introData = homeData?.aModules?.[0]?.oPayload?.sDescription
+    const introsTitle = homeData?.aModules?.[0]?.oPayload?.sTitle || 'Woburn Sands'
+    const introSubTitle = homeData?.aModules?.[0]?.oPayload?.sSubtitle || 'Tennis Club'
+    const introData = homeData?.aModules?.[0]?.oPayload?.sDescription || DEFAULT_INTRO_DESCRIPTION
     const titleParts = headerTitle.split(' ')
     const firstPart = titleParts[0]
     const restParts = titleParts.slice(1).join(' ')
@@ -75,3 +81,4 @@ function HeroSection({
 
 
 export default HeroSection
+ 

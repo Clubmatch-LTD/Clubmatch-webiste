@@ -32,6 +32,11 @@ type Contact = {
   sContactEmail?: string | null
 }
 
+const DEFAULT_SOCIAL_LINKS: SocialLink[] = [
+  { sName: 'Facebook', sLink: 'https://www.facebook.com/' },
+  { sName: 'Instagram', sLink: 'https://www.instagram.com/' },
+]
+
 function Footer({ 
   logo: siteLogo,
   hideLtaLogo,
@@ -48,10 +53,11 @@ function Footer({
   sponsors?: Sponsor[]
   }) {
   const sCta = contact?.sCta || 'Questions? Suggestions? Anything else you want to say?'
-  const sContactEmail = contact?.sContactEmail
+  const sContactEmail = contact?.sContactEmail || 'info@clubmatch.co.uk'
   const ctaParts = sCta.trim().split(/\?\s+/)
   const sCtaSubtitle = ctaParts.length > 1 ? ctaParts.pop() : ''
   const sCtaTitle = ctaParts.length ? `${ctaParts.join('? ')}?` : sCta
+  const resolvedSocialLinks = socialLinks?.length ? socialLinks : DEFAULT_SOCIAL_LINKS
 
   return (
     <>
@@ -93,15 +99,13 @@ function Footer({
               </div>
             )}
             <MyImage src={siteLogo || logo2} alt='logo' height={48} width={122} className='mx-auto w-[122px] h-12 object-contain' />
-            {!!socialLinks?.length && (
-              <div className='flex flex-wrap items-center justify-center gap-3 mt-8'>
-                {socialLinks.map((item) => (
-                  <Badge key={item.sName} href={item.sLink}>
-                    {item.sName}
-                  </Badge>
-                ))}
-              </div>
-            )}
+            <div className='flex flex-wrap items-center justify-center gap-3 mt-8'>
+              {resolvedSocialLinks.map((item) => (
+                <Badge key={item?.sName} href={item?.sLink}>
+                  {item?.sName}
+                </Badge>
+              ))}
+            </div>
             {!hideClubmatchLogo && (
               <div className='flex items-center justify-center gap-1 text-[#4F595980] text-sm mt-8 fon-medium'>
                 Powered by <MyImage src={clubMatch} alt='logo' height={16} width={77} className='w-[77px] h-4 object-cover' />

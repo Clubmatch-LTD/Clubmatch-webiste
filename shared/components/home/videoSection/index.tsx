@@ -28,7 +28,7 @@ function VideoSection({ homeData }: { homeData?: any }) {
     const videoRef = useRef<HTMLVideoElement | null>(null)
 
     const sTitle = homeData?.sTitle || "We're proud to be the best"
-    const sLearnMoreUrl = asString(homeData?.sLearnMoreUrl)
+    const sLearnMoreUrl = asString(homeData?.sLearnMoreUrl) || 'https://www.youtube.com/watch?v=WTD4nLBzbHY'
     const { embedUrl, directUrl } = resolveVideoSource(homeData)
     const iframeSrc = useMemo(
         () => (embedUrl ? withAutoplayParams(embedUrl) : null),

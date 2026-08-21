@@ -2,7 +2,7 @@ export const NEXT_PUBLIC_SITE_NAME = 'Clubmatch'
 export const NEXT_PUBLIC_ENV = process.env.NEXT_PUBLIC_ENV || 'development'
 export const NEXT_PUBLIC_DOMAIN =
   process.env.NEXT_PUBLIC_DOMAIN ||
-  'http://clubmatch-user-stag.s3-website-eu-west-1.amazonaws.com'
+  'http://clubmatch-user-dev.s3-website-eu-west-1.amazonaws.com'
 export const NEXT_PUBLIC_S3_PREFIX =
   process.env.NEXT_PUBLIC_S3_PREFIX ||
   'https://clubmatch-media.s3.eu-west-1.amazonaws.com'

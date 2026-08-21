@@ -9,6 +9,7 @@ import IconMenu from "@/shared/icon/menu"
 import IconClose from "@/shared/icon/close"
 import IconChevronDown from "@/shared/icon/chevronDown"
 import Link from "next/link"
+import { NEXT_PUBLIC_DOMAIN } from "@/shared/constant"
 
 type NavMenuItem = {
     sSlug: string
@@ -88,6 +89,7 @@ function Header({
     }, [pathname])
 
     const useSolidHeaderBg = isMenuOpen || isScrolled
+    const portalBase = NEXT_PUBLIC_DOMAIN.replace(/\/$/, '')
 
     return (
         <header
@@ -179,8 +181,24 @@ function Header({
                 </Link>
             )}
             <div className="flex items-center gap-4 mxs:gap-2">
-                <Button variant="lightWhite" className={isScrolled ? 'py-2 px-4' : ''}>Sign in</Button>
-                <Button variant="white" className={isScrolled ? 'py-2 px-4' : ''}>Register</Button>
+                <Button
+                    href={`${portalBase}` as any}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    variant="lightWhite"
+                    className={isScrolled ? 'py-2 px-4' : ''}
+                >
+                    Sign in
+                </Button>
+                <Button
+                    href={`${portalBase}/walk-through` as any}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    variant="white"
+                    className={isScrolled ? 'py-2 px-4' : ''}
+                >
+                    Register
+                </Button>
             </div>
         </header>
     )

@@ -8,7 +8,7 @@ import EmptyState from '@/shared/components/emptyState'
 import MembershipCard, {
   type MembershipPlan,
 } from '@/shared/components/membershipPage/membershipCard'
-import { clubWebsiteApi } from '@/api/club-website/club-website.api'
+import { getMembershipPlansByClubIdAction } from '@/api/club-website/club-website.actions'
 import Loader from '@/shared/ui/loaders'
 
 
@@ -57,7 +57,7 @@ export default function MembershipPage({
     enabled: !!iClubId && bShowAvailableMemberships,
     initialPageParam: 0,
     queryFn: async ({ pageParam }) => {
-      const res = await clubWebsiteApi.getMembershipPlansByClubId({
+      const res = await getMembershipPlansByClubIdAction({
         iClubId: iClubId!,
         nSkip: pageParam,
         nLimit: 10,

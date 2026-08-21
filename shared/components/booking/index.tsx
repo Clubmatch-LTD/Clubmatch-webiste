@@ -7,7 +7,7 @@ import Button from '@/shared/ui/button'
 import CustomSelect from '@/shared/ui/customSelect'
 import CourtAvailabilityCalendar from '@/shared/components/booking/courtAvailabilityCalendar'
 import EmptyState from '@/shared/components/emptyState'
-import { clubWebsiteApi } from '@/api/club-website/club-website.api'
+import { getCourtsByClubIdAction, getCourtAvailabilityByClubIdAction } from '@/api/club-website/club-website.actions'
 import type { CourtAvailabilityData } from '@/shared/components/booking/courtAvailabilityCalendar/utils'
 
 type PublishedSeo = Record<string, unknown> & {
@@ -52,7 +52,7 @@ export default function BookingPage({
     queryKey: ['club-courts', iClubId, isPreview],
     enabled: !!iClubId,
     queryFn: async () => {
-      const res = await clubWebsiteApi.getCourtsByClubId({
+      const res = await getCourtsByClubIdAction({
         iClubId: iClubId!,
         isPreview,
       })
@@ -78,7 +78,7 @@ export default function BookingPage({
     enabled: !!iClubId && !!selectedCourtId,
     placeholderData: keepPreviousData,
     queryFn: async () => {
-      const res = await clubWebsiteApi.getCourtAvailabilityByClubId({
+      const res = await getCourtAvailabilityByClubIdAction({
         iClubId: iClubId!,
         iCourtId: selectedCourtId,
         isPreview,

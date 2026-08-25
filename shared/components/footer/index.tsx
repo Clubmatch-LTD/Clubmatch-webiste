@@ -134,7 +134,7 @@ function Footer({
               </div>
             )}
             <div className='gap-6 flex items-center mxs:justify-center'>
-              <Link href="" className='text-[#4F595980] font-medium text-xs'>⚙ Cookie Settings</Link>
+              <Link href="" className='text-[#4F595980] font-medium text-xs'>⚙ Cookie Settings</Link> 
               <Link href={NEXT_PUBLIC_PRIVACY_LINK} target='_blank' rel='noopener noreferrer' className='text-[#4F595980] font-medium text-xs'>Privacy Policy</Link>
               <Link href={NEXT_PUBLIC_TERMS_LINK} target='_blank' rel='noopener noreferrer' className='text-[#4F595980] font-medium text-xs'>Legal</Link>
             </div>

@@ -37,12 +37,14 @@ function Header({
     logo: siteLogo, 
     showLogo = true,
     siteSegment, 
-    menuItems: dynamicMenuItems 
+    menuItems: dynamicMenuItems,
+    isLoggedIn = false,
 }: { 
     logo?: string, 
     showLogo?: boolean,
     siteSegment?: string, 
-    menuItems?: NavMenuItem[] 
+    menuItems?: NavMenuItem[],
+    isLoggedIn?: boolean,
 }) {
     const pathname = usePathname()
     const [isMenuOpen, setIsMenuOpen] = useState(false)
@@ -94,12 +96,12 @@ function Header({
     return (
         <header
             className={[
-                'fixed top-0 left-0 w-full z-50 px-16 mxsm:px-3 flex items-center justify-between gap-10 transition-all duration-300 ease-out',
+                'fixed top-0 left-0 w-full z-50 px-16 mxsm:px-3 grid grid-cols-[1fr_auto_1fr] items-center gap-4 transition-all duration-300 ease-out',
                 isScrolled ? 'py-4 mxs:py-3' : 'py-10 mxs:py-4',
                 useSolidHeaderBg ? 'main-bg' : 'bg-transparent',
             ].join(' ')}
         >
-            <div>
+            <div className="justify-self-start">
                 <button
                     type="button"
                     onClick={() => setIsMenuOpen(v => !v)}
@@ -164,8 +166,12 @@ function Header({
                     })}
                 </div>
             </aside>
-            {showLogo && (
-                <Link href={siteSegment ? `/${siteSegment}` : "/"} onClick={() => setIsMenuOpen(false)}>
+            {showLogo ? (
+                <Link
+                    href={siteSegment ? `/${siteSegment}` : "/"}
+                    onClick={() => setIsMenuOpen(false)}
+                    className="justify-self-center"
+                >
                     <MyImage
                         src={siteLogo || logo}
                         alt='logo'
@@ -179,26 +185,32 @@ function Header({
                         ].join(' ')}
                     />
                 </Link>
+            ) : (
+                <div />
             )}
-            <div className="flex items-center gap-4 mxs:gap-2">
-                <Button
-                    href={`${portalBase}` as any}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    variant="lightWhite"
-                    className={isScrolled ? 'py-2 px-4' : ''}
-                >
-                    Sign in
-                </Button>
-                <Button
-                    href={`${portalBase}/walk-through` as any}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    variant="white"
-                    className={isScrolled ? 'py-2 px-4' : ''}
-                >
-                    Register
-                </Button>
+            <div className="justify-self-end flex items-center gap-4 mxs:gap-2 min-h-[44px]">
+                {!isLoggedIn && (
+                    <>
+                        <Button
+                            href={`${portalBase}` as any}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            variant="lightWhite"
+                            className={isScrolled ? 'py-2 px-4' : ''}
+                        >
+                            Sign in
+                        </Button>
+                        <Button
+                            href={`${portalBase}/walk-through` as any}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            variant="white"
+                            className={isScrolled ? 'py-2 px-4' : ''}
+                        >
+                            Register
+                        </Button>
+                    </>
+                )}
             </div>
         </header>
     )

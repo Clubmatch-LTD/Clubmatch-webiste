@@ -10,6 +10,7 @@ import Button from '@/shared/ui/button'
 import Badge from '@/shared/ui/badge'
 import footerBg from '@/assets/images/footer-icon.png'
 import LocationSection from '@/shared/components/home/locationSection'
+import { NEXT_PUBLIC_PRIVACY_LINK, NEXT_PUBLIC_TERMS_LINK } from '@/shared/constant'
 
 type Sponsor = {
   sLogoUrl: string
@@ -134,8 +135,8 @@ function Footer({
             )}
             <div className='gap-6 flex items-center mxs:justify-center'>
               <Link href="" className='text-[#4F595980] font-medium text-xs'>⚙ Cookie Settings</Link>
-              <Link href="" className='text-[#4F595980] font-medium text-xs'>Privacy Policy</Link>
-              <Link href="" className='text-[#4F595980] font-medium text-xs'>Legal</Link>
+              <Link href={NEXT_PUBLIC_PRIVACY_LINK} target='_blank' rel='noopener noreferrer' className='text-[#4F595980] font-medium text-xs'>Privacy Policy</Link>
+              <Link href={NEXT_PUBLIC_TERMS_LINK} target='_blank' rel='noopener noreferrer' className='text-[#4F595980] font-medium text-xs'>Legal</Link>
             </div>
           </div>
         </div>

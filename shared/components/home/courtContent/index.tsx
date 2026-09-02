@@ -1,4 +1,5 @@
 import MyImage from '@/shared/ui/myImage'
+import RichTextContent from '@/shared/ui/richTextContent'
 import demo1 from '@/assets/images/demo1.png'
 import demo2 from '@/assets/images/demo2.png'
 import demo3 from '@/assets/images/demo3.png'
@@ -40,9 +41,6 @@ function CourtContent({ homeData }: { homeData?: any }) {
                 const defaults = DEFAULT_SECTIONS[index % DEFAULT_SECTIONS.length]
                 const title = item.sTitle?.trim() || defaults.sTitle
                 const description = item.sDescription?.trim() || defaults.sDescription
-                const descriptionLines = description
-                    .split('\n')
-                    .filter((line: string) => line.trim() !== '')
 
                 return (
                     <div
@@ -64,11 +62,10 @@ function CourtContent({ homeData }: { homeData?: any }) {
                                 {title}
                             </h3>
                             <div className='h-0.5 w-8 main-bg rounded-sm my-8 sm:my-4 mxs:my-4' />
-                            {descriptionLines.map((line: string, lineIndex: number) => (
-                                <p className='text-neturalMedium text-base font-medium mb-4 last:mb-0 break-words' key={lineIndex}>
-                                    {line}
-                                </p>
-                            ))}
+                            <RichTextContent
+                                content={description}
+                                className="text-neturalMedium"
+                            />
                         </div>
                     </div>
                 )

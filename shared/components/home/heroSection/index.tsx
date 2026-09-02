@@ -1,4 +1,5 @@
 import MyImage from '@/shared/ui/myImage'
+import RichTextContent from '@/shared/ui/richTextContent'
 import court from '@/assets/images/court.jpg'
 import logo from '@/assets/images/wstc.svg'
 import ClubMatch from '@/assets/images/club-match.png'
@@ -23,9 +24,11 @@ function HeroSection({
     const headerSubTitle = homeData?.oHeader?.sSubtitle || 'Tennis Club'
     const headerBg = withS3Prefix(bgImage) || court
     const clubLogo = withS3Prefix(sClubLogo) || logo
-    const introsTitle = homeData?.aModules?.[0]?.oPayload?.sTitle || 'Woburn Sands'
-    const introSubTitle = homeData?.aModules?.[0]?.oPayload?.sSubtitle || 'Tennis Club'
-    const introData = homeData?.aModules?.[0]?.oPayload?.sDescription || DEFAULT_INTRO_DESCRIPTION
+    const introModule = homeData?.aModules?.find((m: any) => m.sKey === 'intro')
+    const introPayload = introModule?.oPayload || {}
+    const introsTitle = introPayload.sTitle || 'Woburn Sands'
+    const introSubTitle = introPayload.sSubtitle || 'Tennis Club'
+    const introData = introPayload.sDescription || DEFAULT_INTRO_DESCRIPTION
     const titleParts = headerTitle.split(' ')
     const firstPart = titleParts[0]
     const restParts = titleParts.slice(1).join(' ')
@@ -61,18 +64,18 @@ function HeroSection({
                 </div>
 
 
-                <div className='max-w-[1184px] mx-auto mt-16 mxs:mt-5'>
+                <div className='max-w-[1184px] mx-auto mt-16 mxs:mt-5 relative z-10'>
                     <h2 className='text-4xl/[48px] mxs:text-2xl text-center heading-font text-white'>
                         <span className='font-semibold block'>{introsTitle}</span>
                         <span className='font-normal block'>{introSubTitle}</span>
                     </h2>
                     <div className='h-0.5 w-8 bg-white rounded-sm my-8 mxs:my-4 mx-auto opacity-50' />
                     
-                    <div className='text-center text-base text-white/75 font-medium space-y-5 mxs:space-y-3 max-w-[960px] mx-auto'>
-                        {introData?.split('\n')?.filter((line: string) => line.trim() !== '').map((line: string, index: number) => (
-                            <p className="text-center text-base text-white/75 font-medium break-words" key={index}>{line}</p>
-                        ))}
-                    </div>
+                    <RichTextContent
+                        content={introData}
+                        variant="inverse"
+                        className="text-center max-w-[960px] mx-auto space-y-5 mxs:space-y-3"
+                    />
                 </div>
             </div>
         </section>

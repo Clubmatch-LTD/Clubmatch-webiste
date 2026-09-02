@@ -2,6 +2,7 @@ import SubBanner from '@/shared/components/subBanner'
 import CourtContent from '@/shared/components/home/courtContent'
 import VideoSection from '@/shared/components/home/videoSection'
 import EmptyState from '@/shared/components/emptyState'
+import RichTextContent from '@/shared/ui/richTextContent'
 
 type PublishedSeo = Record<string, unknown>
 
@@ -51,11 +52,12 @@ function CustomPage({
                             {intro.sSubtitle}
                         </p>
                     )}
-                    {intro?.sDescription?.split('\n')?.filter((line: string) => line?.trim() !== '').map((line: string, idx: number) => (
-                        <p className="text-neturalMedium text-base font-medium mt-4 break-words" key={idx}>
-                            {line}
-                        </p>
-                    ))}
+                    {intro?.sDescription && (
+                        <RichTextContent
+                            content={intro.sDescription}
+                            className="text-neturalMedium mt-4"
+                        />
+                    )}
                 </div>
             )}
 

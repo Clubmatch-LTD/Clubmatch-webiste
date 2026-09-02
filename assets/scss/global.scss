@@ -25,6 +25,7 @@ html, body {
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
+    pointer-events: none;
 }
 .main-2-shape::before{
     content: '';
@@ -37,4 +38,47 @@ html, body {
     background-size: 100% 100%;
     background-position: center;
     background-repeat: no-repeat;
+    pointer-events: none;
+}
+
+.rich-text-content {
+    @apply relative z-10 text-base font-medium break-words;
+
+    p {
+        @apply mb-4 last:mb-0;
+    }
+
+    ul,
+    ol {
+        @apply mb-4 last:mb-0 pl-6;
+    }
+
+    ul {
+        @apply list-disc;
+    }
+
+    ol {
+        @apply list-decimal;
+    }
+
+    li {
+        @apply mb-2 last:mb-0;
+    }
+
+    a {
+        @apply underline underline-offset-2 cursor-pointer pointer-events-auto;
+        color: var(--primary-color);
+    }
+
+    strong {
+        @apply font-semibold;
+    }
+
+    &--inverse {
+        @apply text-white/75;
+
+        a {
+            @apply text-white/90 hover:text-white;
+        }
+    }
 }

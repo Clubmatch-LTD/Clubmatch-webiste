@@ -87,9 +87,13 @@ function Header({
             setIsScrolled(window.scrollY >= 48)
         }
 
-        onScroll()
+        // Defer initial read so SSR markup (isScrolled=false) hydrates cleanly
+        const frame = window.requestAnimationFrame(onScroll)
         window.addEventListener('scroll', onScroll, { passive: true })
-        return () => window.removeEventListener('scroll', onScroll)
+        return () => {
+            window.cancelAnimationFrame(frame)
+            window.removeEventListener('scroll', onScroll)
+        }
     }, [pathname])
 
     useEffect(() => {

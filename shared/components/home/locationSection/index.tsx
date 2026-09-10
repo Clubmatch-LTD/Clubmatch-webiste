@@ -21,13 +21,14 @@ function LocationSection({ locationData }: { locationData?: any }) {
         <div className="rounded-2xl mxs:rounded-none overflow-hidden w-full mt-[72px] mxs:mt-5 aspect-[16/9]">
           <iframe
             src={sGoogleMapUrl}
+            title="Club location map"
             width="100%"
             height="100%"
-            className="block w-full h-full"
-            style={{ border: 0 }}
+            className="block w-full h-full border-0"
             allowFullScreen
             loading="lazy"
             referrerPolicy="no-referrer-when-downgrade"
+            suppressHydrationWarning
           />
         </div>
       ) : null}

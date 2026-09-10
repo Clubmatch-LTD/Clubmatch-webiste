@@ -39,13 +39,23 @@ function normalizeRichTextLinks(html: string): string {
   )
 }
 
+/** Reduce Quill quirks that browsers rewrite during parse (hydration #418). */
+function normalizeQuillHtml(html: string): string {
+  return html
+    .replace(/\u00a0/g, ' ')
+    .replace(/<p><br\s*\/?><\/p>/gi, '<p></p>')
+    .replace(/<br\s*\/?>/gi, '<br>')
+    .replace(/>\s+</g, '><')
+    .trim()
+}
+
 /** Convert intro/section description to renderable HTML (supports Quill HTML and legacy plain text). */
 export function toRichTextHtml(content: string | null | undefined): string {
   const trimmed = content?.trim() ?? ''
   if (!trimmed) return ''
 
   if (/<[a-z][\s\S]*>/i.test(trimmed)) {
-    return normalizeRichTextLinks(trimmed)
+    return normalizeRichTextLinks(normalizeQuillHtml(trimmed))
   }
 
   return trimmed

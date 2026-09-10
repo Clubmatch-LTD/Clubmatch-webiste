@@ -1,87 +1,103 @@
 import MyImage from '@/shared/ui/myImage'
 import RichTextContent from '@/shared/ui/richTextContent'
 import court from '@/assets/images/court.jpg'
-import logo from '@/assets/images/wstc.svg'
 import ClubMatch from '@/assets/images/club-match.png'
 import { withS3Prefix } from '@/shared/utils/seo-utils'
 
-const DEFAULT_INTRO_DESCRIPTION = `We are part of the clubmatch comunity located in the Bedfordshire village of Woburn Sands.  We have two hard courts that are both floodlit. We also have a fantastic clubhouse where our members can relax and enjoy a social coffee while watching the action on the courts.
-We have regular club sessions on Sundays from 9.30 to 12.30 and Wednesday evenings from 18.00 until 20.00, which all full members are welcome to join.
-Year round coaching is provided by our resident tennis coach James Godber and Tenniskool. As well as 1-1 lessons, we provide adult group coaching, high intensity drill sessions and junior group coaching for all ages and abilities including parent and toddler classes.
-Check out our Facebook and Instagram pages for more details.
-For any Welfare concerns please find our Policies and Welfare Officer within the menu in the top navigation.`
+function HeroSection({
+  homeData,
+  bgImage,
+  sClubLogo,
+  clubName
+}: {
+  homeData?: any
+  bgImage?: string | null
+  sClubLogo?: string | null
+  clubName?: string | null
+}) {
+  const headerTitle = homeData?.oHeader?.sTitle?.trim() || clubName?.trim() || ''
+  const headerSubTitle = homeData?.oHeader?.sSubtitle?.trim() || ''
+  const headerBg = withS3Prefix(bgImage) || court
+  const clubLogo = withS3Prefix(sClubLogo)
+  const introModule = homeData?.aModules?.find((m: any) => m.sKey === 'intro')
+  const introPayload = introModule?.oPayload || {}
+  const introsTitle = introPayload.sTitle?.trim() || ''
+  const introSubTitle = introPayload.sSubtitle?.trim() || ''
+  const introData = introPayload.sDescription?.trim() || ''
+  const showIntro = !!(introsTitle || introSubTitle || introData)
+  const titleParts = headerTitle ? headerTitle.split(' ') : []
+  const firstPart = titleParts[0] || ''
+  const restParts = titleParts.slice(1).join(' ')
 
-function HeroSection({ 
-    homeData,
-    bgImage,
-    sClubLogo
-}: { 
-    homeData?: any,
-    bgImage?: string | null,
-    sClubLogo?: string | null
-    }) {
-    const headerTitle = homeData?.oHeader?.sTitle || 'Woburn Sands'
-    const headerSubTitle = homeData?.oHeader?.sSubtitle || 'Tennis Club'
-    const headerBg = withS3Prefix(bgImage) || court
-    const clubLogo = withS3Prefix(sClubLogo) || logo
-    const introModule = homeData?.aModules?.find((m: any) => m.sKey === 'intro')
-    const introPayload = introModule?.oPayload || {}
-    const introsTitle = introPayload.sTitle || 'Woburn Sands'
-    const introSubTitle = introPayload.sSubtitle || 'Tennis Club'
-    const introData = introPayload.sDescription || DEFAULT_INTRO_DESCRIPTION
-    const titleParts = headerTitle.split(' ')
-    const firstPart = titleParts[0]
-    const restParts = titleParts.slice(1).join(' ')
+  return (
+    <section className="pt-[130px] mxs:pt-20 pb-16 mxs:pb-8 main-bg main-shape relative">
+      <div className="px-16 mxsm:px-3">
+        <div className="min-h-[calc(100vh-160px)] p-16 flex flex-col justify-between gap-5 rounded-2xl overflow-hidden relative after:absolute after:inset-0 after:bg-black/40 after:z-10 after:rounded-2xl after:w-full after:h-full">
+          <MyImage
+            src={headerBg}
+            className="w-full h-full max-h-[100vh] object-cover object-top absolute top-0 left-0"
+            alt="court"
+            height={1920}
+            width={1080}
+            priority
+          />
+          <div className="absolute inset-0 main-bg z-10 rounded-2xl w-full h-full opacity-25" />
+          <div />
+          <div className="relative z-20 text-center">
+            {clubLogo ? (
+              <MyImage
+                src={clubLogo}
+                alt="logo"
+                height={500}
+                width={500}
+                className="w-[241px] h-24 mxs:w-[160px] mxs:h-16 mx-auto object-cover"
+              />
+            ) : null}
+            {headerTitle ? (
+              <h1
+                className={`text-white font-extrabold mxs:mt-4 text-[96px]/[88px] sm:text-[64px]/[72px] mxs:text-4xl heading-font shadow-1 ${clubLogo ? 'mt-8' : 'mt-0'}`}
+              >
+                {firstPart} {restParts ? <span className="font-normal">{restParts}</span> : null}
+              </h1>
+            ) : null}
+            {headerSubTitle ? (
+              <p className="text-[32px]/[32px] text-white/80 mt-4 mxs:text-xl heading-font font-medium shadow-1 break-words max-w-[960px] mx-auto">
+                {headerSubTitle}
+              </p>
+            ) : null}
+          </div>
+          <MyImage
+            src={ClubMatch}
+            alt="club match"
+            height={32}
+            width={154}
+            className="w-[154px] h-8 mx-auto object-cover relative z-20"
+          />
+        </div>
 
-    return (
-        <section className='pt-[130px] mxs:pt-20 pb-16 mxs:pb-8 main-bg main-shape relative'>
-            <div className='px-16 mxsm:px-3'>
-                <div className='min-h-[calc(100vh-160px)] p-16 flex flex-col justify-between gap-5 rounded-2xl overflow-hidden relative after:absolute after:inset-0 after:bg-black/40 after:z-10 after:rounded-2xl after:w-full after:h-full'>
-                    <MyImage
-                        src={headerBg}
-                        className='w-full h-full object-cover absolute inset-0'
-                        alt='court'
-                        height={1920}
-                        width={1080}
-                        priority
-                    />
-                    <div className='absolute inset-0 main-bg z-10 rounded-2xl w-full h-full opacity-25' />
-                    <div />
-                    <div className='relative z-20 text-center'>
-                        <MyImage 
-                            src={clubLogo} 
-                            alt='logo' 
-                            height={500} 
-                            width={500} 
-                            className='w-[241px] h-24 mxs:w-[160px] mxs:h-16 mx-auto object-cover' 
-                        />
-                        <h1 className='text-white font-extrabold mt-8 mxs:mt-4 text-[96px]/[88px] sm:text-[64px]/[72px] mxs:text-4xl heading-font shadow-1'>
-                            {firstPart} <span className='font-normal'>{restParts}</span>
-                        </h1>
-                        <p className='text-[32px]/[32px] text-white/80 mt-4 mxs:text-xl heading-font font-medium shadow-1'>{headerSubTitle}</p>
-                    </div>
-                    <MyImage src={ClubMatch} alt='club match' height={32} width={154} className='w-[154px] h-8 mx-auto object-cover relative z-20' />
-                </div>
-
-
-                <div className='max-w-[1184px] mx-auto mt-16 mxs:mt-5 relative z-10'>
-                    <h2 className='text-4xl/[48px] mxs:text-2xl text-center heading-font text-white'>
-                        <span className='font-semibold block'>{introsTitle}</span>
-                        <span className='font-normal block'>{introSubTitle}</span>
-                    </h2>
-                    <div className='h-0.5 w-8 bg-white rounded-sm my-8 mxs:my-4 mx-auto opacity-50' />
-                    
-                    <RichTextContent
-                        content={introData}
-                        variant="inverse"
-                        className="text-center max-w-[960px] mx-auto space-y-5 mxs:space-y-3"
-                    />
-                </div>
-            </div>
-        </section>
-    )
+        {showIntro ? (
+          <div className="max-w-[1184px] mx-auto mt-16 mxs:mt-5 relative z-10">
+            {(introsTitle || introSubTitle) && (
+              <h2 className="text-4xl/[48px] mxs:text-2xl text-center heading-font text-white">
+                {introsTitle ? <span className="font-semibold block">{introsTitle}</span> : null}
+                {introSubTitle ? <span className="font-normal block">{introSubTitle}</span> : null}
+              </h2>
+            )}
+            {(introsTitle || introSubTitle) && introData ? (
+              <div className="h-0.5 w-8 bg-white rounded-sm my-8 mxs:my-4 mx-auto opacity-50" />
+            ) : null}
+            {introData ? (
+              <RichTextContent
+                content={introData}
+                variant="inverse"
+                className="text-center max-w-[960px] mx-auto space-y-5 mxs:space-y-3"
+              />
+            ) : null}
+          </div>
+        ) : null}
+      </div>
+    </section>
+  )
 }
 
-
 export default HeroSection
- 

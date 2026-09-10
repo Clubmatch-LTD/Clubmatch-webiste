@@ -10,7 +10,6 @@ export const NEXT_PUBLIC_API_URL =
   process.env.NEXT_PUBLIC_API_URL || 'http://52.213.170.31:5200/api/'
 
 // Club website identifier used for published SEO + site settings.
-// Example: "WoburnSands"
 export const NEXT_PUBLIC_SITE_SEGMENT =
   process.env.NEXT_PUBLIC_SITE_SEGMENT || ''
 // export const NEXT_PUBLIC_ONESIGNAL_APP_ID =

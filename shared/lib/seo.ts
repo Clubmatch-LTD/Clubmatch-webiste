@@ -153,23 +153,27 @@ export async function fetchPublishedClubWebsiteDesign({
     if (oTypography?.eHeadingFont)
       result.eHeadingFont = oTypography.eHeadingFont
     if (oTypography?.eBodyFont) result.eBodyFont = oTypography.eBodyFont
-    if (sClubColorLogo)
-      result.sClubColorLogo = withS3Prefix(sClubColorLogo)
+    if (sClubColorLogo) result.sClubColorLogo = withS3Prefix(sClubColorLogo)
     if (sClubMonoLogo) result.sClubMonoLogo = withS3Prefix(sClubMonoLogo)
     if (sFavicon) result.sFavicon = withS3Prefix(sFavicon)
     if (oLogos?.bShowClubLogoInHeader !== undefined) {
       result.bShowClubLogoInHeader = String(!!oLogos.bShowClubLogoInHeader)
     }
     if (Array.isArray(oDesign?.aSponsorship)) {
-      result.aSponsorship = oDesign.aSponsorship.map((item: any) => {
-        const sWebsiteUrl = asString(item?.sWebsiteUrl)
-        return {
-          sLogoUrl: withS3Prefix(item?.oSponsorLogo?.sFileUrl),
-          sWebsiteUrl: sWebsiteUrl && !/^https?:\/\//i.test(sWebsiteUrl)
-            ? `https://${sWebsiteUrl}`
-            : sWebsiteUrl
-        }
-      })
+      result.aSponsorship = oDesign.aSponsorship
+        .map((item: any) => {
+          const sLogoUrl = withS3Prefix(item?.oSponsorLogo?.sFileUrl)
+          if (!sLogoUrl) return null
+          const sWebsiteUrl = asString(item?.sWebsiteUrl)
+          return {
+            sLogoUrl,
+            sWebsiteUrl:
+              sWebsiteUrl && !/^https?:\/\//i.test(sWebsiteUrl)
+                ? `https://${sWebsiteUrl}`
+                : sWebsiteUrl
+          }
+        })
+        .filter(Boolean)
     }
 
     // Site Settings
@@ -179,7 +183,9 @@ export async function fetchPublishedClubWebsiteDesign({
       result.bHideClubmatchFooterLogo = String(
         !!oLogoSettings.bHideClubmatchFooterLogo
       )
-    const sGoogleAnalyticsId = asString(oSiteSettings?.oAnalytics?.sGoogleAnalyticsId)
+    const sGoogleAnalyticsId = asString(
+      oSiteSettings?.oAnalytics?.sGoogleAnalyticsId
+    )
     if (sGoogleAnalyticsId) result.sGoogleAnalyticsId = sGoogleAnalyticsId
 
     if (oSiteSettings?.bEnableFilesPage !== undefined) {
@@ -206,7 +212,7 @@ export async function fetchPublishedClubWebsiteDesign({
         sAddress: asString(oContact.sAddress),
         sGoogleMapUrl: asString(oContact.sGoogleMapUrl),
         sCta: asString(oContact.sCta),
-        sContactEmail: asString(oContact.sContactEmail),
+        sContactEmail: asString(oContact.sContactEmail)
       }
     }
 
@@ -266,9 +272,9 @@ export function getSeoPayload(
     seo?.oSeo && typeof seo.oSeo === 'object' ? seo.oSeo : {}
   ) as Record<string, unknown>
   const title =
+    asString(oSeo?.sPageTitle) ||
     asString(seo?.title) ||
     asString(seo?.sTitle) ||
-    asString(oSeo?.sPageTitle) ||
     'Clubmatch'
   const description =
     asString(seo?.description) ||

@@ -9,7 +9,7 @@ import {
   toHeaderValue,
   fetchPublishedSeo,
   fetchPublishedClubWebsiteDesign,
-  getSeoPayload,
+  getSeoPayload
 } from '@/shared/lib/seo'
 import { AUTH_TOKEN_COOKIE, hasAuthToken } from '@/shared/lib/membersOnly'
 
@@ -34,12 +34,16 @@ export async function middleware(req: NextRequest) {
   const pathname = req.nextUrl.pathname
 
   if (pathname === '/') {
-    return NextResponse.redirect(new URL(`/${NEXT_PUBLIC_SITE_SEGMENT}`, req.url))
+    return NextResponse.redirect(
+      new URL(`/${NEXT_PUBLIC_SITE_SEGMENT}`, req.url)
+    )
   }
 
   const pathSegment = getSiteSegmentFromPath(pathname)
   const sSiteSegment = pathSegment || NEXT_PUBLIC_SITE_SEGMENT
-  const effectivePathname = pathSegment ? stripSiteSegmentFromPath(pathname) : pathname
+  const effectivePathname = pathSegment
+    ? stripSiteSegmentFromPath(pathname)
+    : pathname
   const sSlug = convertUrl(effectivePathname)
   const isPreview = req.nextUrl.searchParams.get('isPreview') === 'true'
 
@@ -50,7 +54,7 @@ export async function middleware(req: NextRequest) {
       sSlug,
       sSiteSegment,
       headers: requestHeaders,
-      isPreview,
+      isPreview
     })
 
     const clubId = rawSeo?.iClubId
@@ -58,11 +62,17 @@ export async function middleware(req: NextRequest) {
       ? await fetchPublishedClubWebsiteDesign({
           iClubId: clubId,
           headers: requestHeaders,
-          isPreview,
+          isPreview
         })
       : null
 
-    const seoPayload = getSeoPayload(rawSeo, designData, null, sSiteSegment, isPreview)
+    const seoPayload = getSeoPayload(
+      rawSeo,
+      designData,
+      null,
+      sSiteSegment,
+      isPreview
+    )
     const headerValue = toHeaderValue(seoPayload || { nf: true })
     requestHeaders.set(SEO_HEADER_KEY, headerValue)
 
@@ -88,5 +98,7 @@ export async function middleware(req: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/((?!_next/static|_next/image|favicon.ico|robots.txt|sitemap.xml).*)'],
+  matcher: [
+    '/((?!_next/static|_next/image|favicon.ico|robots.txt|sitemap.xml).*)'
+  ]
 }

@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react"
 import { usePathname } from "next/navigation"
 import MyImage from "@/shared/ui/myImage"
-import logo from '@/assets/images/wstc.svg'
 import Button from "@/shared/ui/button"
 import IconMenu from "@/shared/icon/menu"
 import IconClose from "@/shared/icon/close"
@@ -47,6 +46,9 @@ function Header({
     isLoggedIn?: boolean,
 }) {
     const pathname = usePathname()
+    // Avoid hydration mismatch from middleware rewrites: don't use pathname
+    // for active styles until after mount. Browser URL matches menu hrefs.
+    const [activePath, setActivePath] = useState('')
     const [isMenuOpen, setIsMenuOpen] = useState(false)
     const [isScrolled, setIsScrolled] = useState(false)
     const base = siteSegment ? `/${siteSegment}` : ""
@@ -54,6 +56,10 @@ function Header({
     const menuItems: ResolvedMenuItem[] = (dynamicMenuItems && dynamicMenuItems.length > 0)
         ? dynamicMenuItems.map(item => buildMenuItem(item, base))
         : [{ label: 'Home', href: base, children: [] }]
+
+    useEffect(() => {
+        setActivePath(window.location.pathname)
+    }, [pathname])
 
     useEffect(() => {
         const html = document.documentElement
@@ -105,17 +111,21 @@ function Header({
                 <button
                     type="button"
                     onClick={() => setIsMenuOpen(v => !v)}
-                    className={`mxsm:w-11 mxsm:h-11 mxsm:p-3 text-white relative border ${isMenuOpen ? 'border-white/20 bg-transparent backdrop-blur-[162px]' : 'border-transparent bg-white/20 backdrop-blur-[32px]'} z-[70] font-bold rounded-full flex items-center gap-3 transition-all duration-300 ease-out ${isScrolled ? 'py-2 px-4' : 'py-3 px-5'}`}
+                    aria-label="Menu"
+                    aria-expanded={isMenuOpen}
+                    aria-controls="site-menu"
+                    className={`text-white relative border ${isMenuOpen ? 'border-white/20 bg-transparent backdrop-blur-[162px]' : 'border-transparent bg-white/20 backdrop-blur-[32px]'} z-[70] font-bold rounded-full flex items-center gap-3 transition-all duration-300 ease-out ${isScrolled ? 'py-2 px-4' : 'py-3 px-5'}`}
                 >
-                    <span className="w-6 h-6 block">
+                    <span className="w-6 h-6 block" aria-hidden="true">
                         {isMenuOpen ? <IconClose /> : <IconMenu />}
                     </span>
-                    <span className="mxsm:hidden">Menu</span>
+                    <span>Menu</span>
                 </button>
             </div>
 
             {/* Left slide panel */}
             <aside
+                id="site-menu"
                 className={[
                     "fixed top-0 left-0 h-full w-full after:absolute after:inset-0 after:bg-gradient-overlay after:w-full after:h-full after:opacity-85 z-[60] shadow-2xl transition-transform duration-300 ease-out pt-[128px] mxs:pt-20",
                     isMenuOpen ? "translate-x-0" : "-translate-x-full",
@@ -124,56 +134,80 @@ function Header({
                 aria-modal="true"
                 aria-label="Menu"
             >
-                <div className="flex flex-col gap-4 relative z-10 h-[calc(100dvh-128px)] mxs:h-[calc(100dvh-80px)] overflow-y-auto">
-                    {menuItems.map(item => {
-                        const hasChildren = item.children.length > 0
-                        const isOpen = pathname === item.href || pathname.startsWith(item.href + '/')
-                        return (
-                            <div key={item.href} className={hasChildren ? "group" : undefined}>
-                                <div className={`px-20 mxs:px-5  relative after:absolute after:inset-0 after:bg-gradient-active after:w-full after:h-full after:opacity-0 aftre:transition-all after:duration-300 after:ease-out hover:after:opacity-20 ${pathname === item.href ? 'after:opacity-20' : ''}`}>
-                                    <Link
-                                        href={item.href}
-                                        className="text-white text-xl mxs:text-base font-bold z-10 relative py-[25px] mxs:py-3 flex items-center gap-2"
-                                        onClick={() => setIsMenuOpen(false)}
-                                    >
-                                        {item.label}
-                                        {hasChildren && (
-                                            <span className={`w-4 h-4 mxs:w-3.5 mxs:h-3.5 inline-block text-white/70 transition-transform duration-300 ease-out group-hover:rotate-180 ${isOpen ? 'rotate-180' : ''}`}>
-                                                <IconChevronDown />
-                                            </span>
-                                        )}
-                                    </Link>
-                                </div>
-                                {hasChildren && (
-                                    <div className={`grid group-hover:grid-rows-[1fr] transition-[grid-template-rows] duration-300 ease-out ${isOpen ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]'}`}>
-                                        <div className="overflow-hidden flex flex-col gap-4">
-                                            {item.children.map(child => (
-                                                <div key={child.href} className={`px-24 mxs:px-8 relative after:absolute after:inset-0 after:bg-gradient-active after:w-full after:h-full after:opacity-0 aftre:transition-all after:duration-300 after:ease-out hover:after:opacity-20 ${pathname === child.href ? 'after:opacity-20' : ''}`}>
-                                                    <Link
-                                                        href={child.href}
-                                                        className="text-white/70 text-xl mxs:text-base font-bold z-10 relative py-[25px] mxs:py-3 flex items-center"
-                                                        onClick={() => setIsMenuOpen(false)}
-                                                    >
-                                                        {child.label}
-                                                    </Link>
-                                                </div>
-                                            ))}
-                                        </div>
+                <div className="flex flex-col relative z-10 h-[calc(100dvh-128px)] mxs:h-[calc(100dvh-80px)]">
+                    <div className="flex flex-col gap-4 overflow-y-auto flex-1">
+                        {menuItems.map(item => {
+                            const hasChildren = item.children.length > 0
+                            const isOpen = activePath === item.href || activePath.startsWith(item.href + '/')
+                            return (
+                                <div key={item.href} className={hasChildren ? "group" : undefined}>
+                                    <div className={`px-20 mxs:px-5  relative after:absolute after:inset-0 after:bg-gradient-active after:w-full after:h-full after:opacity-0 aftre:transition-all after:duration-300 after:ease-out hover:after:opacity-20 ${activePath === item.href ? 'after:opacity-20' : ''}`}>
+                                        <Link
+                                            href={item.href}
+                                            className="text-white text-xl mxs:text-base font-bold z-10 relative py-[25px] mxs:py-3 flex items-center gap-2"
+                                            onClick={() => setIsMenuOpen(false)}
+                                        >
+                                            {item.label}
+                                            {hasChildren && (
+                                                <span className={`w-4 h-4 mxs:w-3.5 mxs:h-3.5 inline-block text-white/70 transition-transform duration-300 ease-out group-hover:rotate-180 ${isOpen ? 'rotate-180' : ''}`}>
+                                                    <IconChevronDown />
+                                                </span>
+                                            )}
+                                        </Link>
                                     </div>
-                                )}
-                            </div>
-                        )
-                    })}
+                                    {hasChildren && (
+                                        <div className={`grid group-hover:grid-rows-[1fr] transition-[grid-template-rows] duration-300 ease-out ${isOpen ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]'}`}>
+                                            <div className="overflow-hidden flex flex-col gap-4">
+                                                {item.children.map(child => (
+                                                    <div key={child.href} className={`px-24 mxs:px-8 relative after:absolute after:inset-0 after:bg-gradient-active after:w-full after:h-full after:opacity-0 aftre:transition-all after:duration-300 after:ease-out hover:after:opacity-20 ${activePath === child.href ? 'after:opacity-20' : ''}`}>
+                                                        <Link
+                                                            href={child.href}
+                                                            className="text-white/70 text-xl mxs:text-base font-bold z-10 relative py-[25px] mxs:py-3 flex items-center"
+                                                            onClick={() => setIsMenuOpen(false)}
+                                                        >
+                                                            {child.label}
+                                                        </Link>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
+                            )
+                        })}
+                    </div>
+                    {!isLoggedIn && (
+                        <div className="hidden mxs:flex flex-col gap-3 px-5 pb-8 pt-4 mt-auto shrink-0">
+                            <Button
+                                href={`${portalBase}` as any}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                variant="lightWhite"
+                                className="w-full"
+                            >
+                                Sign in
+                            </Button>
+                            <Button
+                                href={`${portalBase}/walk-through` as any}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                variant="white"
+                                className="w-full"
+                            >
+                                Register
+                            </Button>
+                        </div>
+                    )}
                 </div>
             </aside>
-            {showLogo ? (
+            {showLogo && siteLogo ? (
                 <Link
                     href={siteSegment ? `/${siteSegment}` : "/"}
                     onClick={() => setIsMenuOpen(false)}
                     className="justify-self-center"
                 >
                     <MyImage
-                        src={siteLogo || logo}
+                        src={siteLogo}
                         alt='logo'
                         height={500}
                         width={500}
@@ -188,9 +222,9 @@ function Header({
             ) : (
                 <div />
             )}
-            <div className="justify-self-end flex items-center gap-4 mxs:gap-2 min-h-[44px]">
+            <div className="justify-self-end min-h-[44px] flex items-center justify-end">
                 {!isLoggedIn && (
-                    <>
+                    <div className="hidden msm:flex items-center gap-4">
                         <Button
                             href={`${portalBase}` as any}
                             target="_blank"
@@ -209,7 +243,7 @@ function Header({
                         >
                             Register
                         </Button>
-                    </>
+                    </div>
                 )}
             </div>
         </header>

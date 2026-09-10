@@ -2,10 +2,8 @@
 
 import MyImage from '@/shared/ui/myImage'
 import logo from '@/assets/images/lta-logo-white.png'
-import logo2 from '@/assets/images/wstc-logo.svg'
 import Link from 'next/link'
 import clubMatch from '@/assets/images/club-logo.svg'
-import sponsorDefault from '@/assets/images/sponsor.png'
 import Button from '@/shared/ui/button'
 import Badge from '@/shared/ui/badge'
 import footerBg from '@/assets/images/footer-icon.png'
@@ -13,7 +11,7 @@ import LocationSection from '@/shared/components/home/locationSection'
 import { NEXT_PUBLIC_PRIVACY_LINK, NEXT_PUBLIC_TERMS_LINK } from '@/shared/constant'
 
 type Sponsor = {
-  sLogoUrl: string
+  sLogoUrl?: string | null
   sWebsiteUrl?: string
 }
 
@@ -33,114 +31,166 @@ type Contact = {
   sContactEmail?: string | null
 }
 
-const DEFAULT_SOCIAL_LINKS: SocialLink[] = [
-  { sName: 'Facebook', sLink: 'https://www.facebook.com/' },
-  { sName: 'Instagram', sLink: 'https://www.instagram.com/' },
-]
-
-function Footer({ 
+function Footer({
   logo: siteLogo,
   hideLtaLogo,
   hideClubmatchLogo,
   contact,
   socialLinks,
   sponsors
-}: { 
-  logo?: string,
-  hideLtaLogo?: boolean,
-  hideClubmatchLogo?: boolean,
-  contact?: Contact,
-  socialLinks?: SocialLink[],
+}: {
+  logo?: string
+  hideLtaLogo?: boolean
+  hideClubmatchLogo?: boolean
+  contact?: Contact
+  socialLinks?: SocialLink[]
   sponsors?: Sponsor[]
-  }) {
-  const sCta = contact?.sCta || 'Questions? Suggestions? Anything else you want to say?'
-  const sContactEmail = contact?.sContactEmail || 'info@clubmatch.co.uk'
-  const ctaParts = sCta.trim().split(/\?\s+/)
+}) {
+  const sCta = contact?.sCta?.trim() || ''
+  const sContactEmail = contact?.sContactEmail?.trim() || ''
+  const ctaParts = sCta ? sCta.split(/\?\s+/) : []
   const sCtaSubtitle = ctaParts.length > 1 ? ctaParts.pop() : ''
   const sCtaTitle = ctaParts.length ? `${ctaParts.join('? ')}?` : sCta
-  const resolvedSocialLinks = socialLinks?.length ? socialLinks : DEFAULT_SOCIAL_LINKS
+  const resolvedSocialLinks = (socialLinks || []).filter((item) => item?.sName?.trim() && item?.sLink?.trim())
+  const resolvedSponsors = (sponsors || []).filter((sponsor) => !!sponsor?.sLogoUrl?.trim())
+  const showContactBlock = !!(sCta || sContactEmail)
 
   return (
     <>
       <LocationSection locationData={contact} />
-      <footer className='relative before:absolute before:inset-0 before:bg-footer-gradient before:w-full before:h-full before:opacity-25 pb-[72px] mxs:pb-10 overflow-hidden px-3'>
-        <div className='max-w-[1296px] mx-auto relative z-10'>
-          <div className='text-center'>
-            <h3 className='font-extrabold text-[56px]/[72px] mxs:text-2xl text-neturalDark heading-font'>
-              {sCtaTitle}
-              {sCtaSubtitle && (
-                <span className='font-medium block'>{sCtaSubtitle}</span>
-              )}
-            </h3>
-            {sContactEmail && (
-              <Button href={`mailto:${sContactEmail}`} variant='primary' className='mt-[72px] mx-auto px-8 mxs:px-5 mxs:mt-5'>
-                Contact us
-              </Button>
-            )}
-          </div>
-          <div className='text-center mb-8 mt-[128px] mxs:mt-10'>
-            {!!sponsors?.length && (
-              <div className='flex flex-wrap items-center justify-center gap-10 mxs:gap-6 mb-10 mxs:mb-8'>
-                {sponsors.map((sponsor, index) => (
-                  <a
-                    key={index}
-                    href={sponsor.sWebsiteUrl}
-                    target='_blank'
-                    rel='noopener noreferrer'
-                    className='opacity-80 hover:opacity-100 transition-opacity'
-                  >
+      <footer className="relative before:absolute before:inset-0 before:bg-footer-gradient before:w-full before:h-full before:opacity-25 pb-[72px] mxs:pb-10 overflow-hidden px-3">
+        <div className="max-w-[1296px] mx-auto relative z-10">
+          {showContactBlock ? (
+            <div className="text-center">
+              {sCtaTitle ? (
+                <h3 className="font-extrabold text-[56px]/[72px] mxs:text-2xl text-neturalDark heading-font">
+                  {sCtaTitle}
+                  {sCtaSubtitle ? <span className="font-medium block">{sCtaSubtitle}</span> : null}
+                </h3>
+              ) : null}
+              {sContactEmail ? (
+                <Button
+                  href={`mailto:${sContactEmail}`}
+                  variant="primary"
+                  className={`mx-auto px-8 mxs:px-5 ${sCtaTitle ? 'mt-[72px] mxs:mt-5' : 'mt-0'}`}
+                >
+                  Contact us
+                </Button>
+              ) : null}
+            </div>
+          ) : null}
+          <div className={`text-center mb-8 ${showContactBlock ? 'mt-[128px] mxs:mt-10' : 'mt-16 mxs:mt-10'}`}>
+            {resolvedSponsors.length > 0 ? (
+              <div className="flex flex-wrap items-center justify-center gap-x-10 gap-y-8 mxs:gap-x-6 mxs:gap-y-6 mb-10 mxs:mb-8">
+                {resolvedSponsors.map((sponsor, index) => {
+                  const logoImage = (
                     <MyImage
-                      src={sponsor.sLogoUrl || sponsorDefault}
+                      src={sponsor.sLogoUrl!}
                       alt={`Sponsor ${index + 1}`}
-                      height={16} width={77}
-                      className='w-[77px] h-4 object-cover'
+                      height={100}
+                      width={220}
+                      className="min-w-[100px] max-w-[220px] max-h-[100px] object-contain"
+                      style={{ width: 'auto', height: 'auto' }}
                     />
-                  </a>
+                  )
+                  const websiteUrl = sponsor.sWebsiteUrl?.trim()
+
+                  return websiteUrl ? (
+                    <a
+                      key={index}
+                      href={websiteUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center justify-center shrink-0 opacity-80 hover:opacity-100 transition-opacity"
+                    >
+                      {logoImage}
+                    </a>
+                  ) : (
+                    <span
+                      key={index}
+                      className="inline-flex items-center justify-center shrink-0 opacity-80"
+                    >
+                      {logoImage}
+                    </span>
+                  )
+                })}
+              </div>
+            ) : null}
+            {siteLogo ? (
+              <MyImage
+                src={siteLogo}
+                alt="logo"
+                height={48}
+                width={122}
+                className="mx-auto w-[122px] h-12 object-contain"
+              />
+            ) : null}
+            {resolvedSocialLinks.length > 0 ? (
+              <div className="flex flex-wrap items-center justify-center gap-3 mt-8">
+                {resolvedSocialLinks.map((item) => (
+                  <Badge key={item?.sName} href={item?.sLink}>
+                    {item?.sName}
+                  </Badge>
                 ))}
               </div>
-            )}
-            <MyImage src={siteLogo || logo2} alt='logo' height={48} width={122} className='mx-auto w-[122px] h-12 object-contain' />
-            <div className='flex flex-wrap items-center justify-center gap-3 mt-8'>
-              {resolvedSocialLinks.map((item) => (
-                <Badge key={item?.sName} href={item?.sLink}>
-                  {item?.sName}
-                </Badge>
-              ))}
-            </div>
+            ) : null}
             {!hideClubmatchLogo && (
-              <div className='flex items-center justify-center gap-1 text-[#4F595980] text-sm mt-8 fon-medium'>
-                Powered by <MyImage src={clubMatch} alt='logo' height={16} width={77} className='w-[77px] h-4 object-cover' />
+              <div className="flex items-center justify-center gap-1 text-[#4F595980] text-sm mt-8 fon-medium">
+                Powered by{' '}
+                <MyImage src={clubMatch} alt="logo" height={16} width={77} className="w-[77px] h-4 object-cover" />
               </div>
             )}
             <button
-              type='button'
+              type="button"
               onClick={scrollToTopSmooth}
-              className='text-sm font-extrabold text-[#4F595980] mt-8 cursor-pointer hover:text-neturalMedium transition-colors'
+              className="text-sm font-extrabold text-[#4F595980] mt-8 cursor-pointer hover:text-neturalMedium transition-colors"
             >
               Scroll to top
             </button>
           </div>
-          <div className='flex mxs:flex-col gap-5 mxs:justify-center msm:items-center justify-between pt-7 msm:justify-between border-t border-neturalDark/10'>
-            <p className='text-[#4F595980] font-medium text-xs mxs:text-center'>© Copyright 2026 | All rights reserved </p>
+          <div className="flex mxs:flex-col gap-5 mxs:justify-center msm:items-center justify-between pt-7 msm:justify-between border-t border-neturalDark/10">
+            <p className="text-[#4F595980] font-medium text-xs mxs:text-center">© Copyright 2026 | All rights reserved </p>
             {!hideLtaLogo && (
               <div>
                 <MyImage
                   src={logo}
-                  alt='logo'
+                  alt="logo"
                   height={24}
                   width={70}
-                  className='w-[70px] h-6 object-cover mx-auto'
+                  className="w-[70px] h-6 object-cover mx-auto"
                 />
               </div>
             )}
-            <div className='gap-6 flex items-center mxs:justify-center'>
-              <Link href="" className='text-[#4F595980] font-medium text-xs'>⚙ Cookie Settings</Link> 
-              <Link href={NEXT_PUBLIC_PRIVACY_LINK} target='_blank' rel='noopener noreferrer' className='text-[#4F595980] font-medium text-xs'>Privacy Policy</Link>
-              <Link href={NEXT_PUBLIC_TERMS_LINK} target='_blank' rel='noopener noreferrer' className='text-[#4F595980] font-medium text-xs'>Legal</Link>
+            <div className="gap-6 flex items-center mxs:justify-center">
+              <Link href="" className="text-[#4F595980] font-medium text-xs">
+                ⚙ Cookie Settings
+              </Link>
+              <Link
+                href={NEXT_PUBLIC_PRIVACY_LINK}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-[#4F595980] font-medium text-xs"
+              >
+                Privacy Policy
+              </Link>
+              <Link
+                href={NEXT_PUBLIC_TERMS_LINK}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-[#4F595980] font-medium text-xs"
+              >
+                Legal
+              </Link>
             </div>
           </div>
         </div>
-        <MyImage src={footerBg} alt='footer bg' height={704} width={1296} className='absolute -bottom-40 right-0 w-full h-full object-cover opacity-60' />
+        <MyImage
+          src={footerBg}
+          alt="footer bg"
+          height={704}
+          width={1296}
+          className="absolute -bottom-40 right-0 w-full h-full object-cover opacity-60"
+        />
       </footer>
     </>
   )

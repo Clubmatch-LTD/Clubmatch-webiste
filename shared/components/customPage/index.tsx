@@ -23,7 +23,11 @@ function CustomPage({
 
     const intro = introModule?.oPayload || {}
     const hasIntro = introModule?.bEnabled !== false && !!(intro?.sTitle || intro?.sSubtitle || intro?.sDescription)
-    const hasSections = sectionsModule?.bEnabled !== false && (sectionsModule?.oPayload?.aItems?.length > 0)
+    const hasSections =
+      sectionsModule?.bEnabled !== false &&
+      (sectionsModule?.oPayload?.aItems || []).some(
+        (item: any) => item?.sTitle?.trim() || item?.sDescription?.trim() || item?.oImage?.sFileUrl
+      )
     const videoPayload = videoModule?.oPayload
     const hasVideo = videoModule?.bEnabled !== false && !!(
         videoPayload?.sVideoUrl?.trim() ||
@@ -37,7 +41,7 @@ function CustomPage({
         <>
             <SubBanner
                 title={oHeader?.sTitle || (publishedSeo?.title as string)}
-                description={oHeader?.sSubtitle || (publishedSeo?.sClubName as string) || 'Woburn Sands Tennis Club'}
+                description={oHeader?.sSubtitle}
                 bgImage={oHeader?.oHeaderImage?.sFileUrl}
             />
             {hasIntro && (

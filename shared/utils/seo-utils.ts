@@ -7,7 +7,11 @@ export function asString(value: unknown): string | null {
 export function withS3Prefix(path: unknown): string | null {
   const sPath = asString(path)
   if (!sPath) return null
-  if (sPath.startsWith('http') || sPath.startsWith('//') || sPath.startsWith('data:')) {
+  if (
+    sPath.startsWith('http') ||
+    sPath.startsWith('//') ||
+    sPath.startsWith('data:')
+  ) {
     return sPath
   }
   return `${NEXT_PUBLIC_S3_PREFIX.replace(/\/+$/, '')}/${sPath.replace(/^\/+/, '')}`
@@ -15,12 +19,12 @@ export function withS3Prefix(path: unknown): string | null {
 
 export function asKeywords(value: unknown): string[] {
   if (Array.isArray(value)) {
-    return value.map((item) => asString(item)).filter(Boolean) as string[]
+    return value.map(item => asString(item)).filter(Boolean) as string[]
   }
   if (typeof value === 'string' && value.trim()) {
     return value
       .split(',')
-      .map((item) => item.trim())
+      .map(item => item.trim())
       .filter(Boolean)
   }
   return []
@@ -40,7 +44,8 @@ export function formatFileSize(nBytes: unknown): string {
     value /= 1024
     unitIndex += 1
   }
-  const rounded = unitIndex === 0 ? Math.round(value) : Math.round(value * 10) / 10
+  const rounded =
+    unitIndex === 0 ? Math.round(value) : Math.round(value * 10) / 10
   return `${rounded} ${units[unitIndex]}`
 }
 
@@ -81,19 +86,20 @@ export function isDirectVideoFile(url: unknown): boolean {
   return /\.(mp4|webm|ogg)(\?|$)/i.test(value)
 }
 
-const DEFAULT_VIDEO_URL = 'https://www.youtube.com/watch?v=WTD4nLBzbHY'
-
 export function resolveVideoSource(payload?: {
   sVideoUrl?: string
   oVideo?: { sFileUrl?: string }
 }) {
   const linkUrl = asString(payload?.sVideoUrl)
   const legacyFileUrl = withS3Prefix(payload?.oVideo?.sFileUrl)
-  const url = linkUrl || legacyFileUrl || DEFAULT_VIDEO_URL
+  const url = linkUrl || legacyFileUrl
+  if (!url) {
+    return { embedUrl: null, directUrl: null }
+  }
   const embedUrl = getVideoEmbedUrl(url)
 
   return {
     embedUrl,
-    directUrl: embedUrl ? null : url,
+    directUrl: embedUrl ? null : url
   }
 }

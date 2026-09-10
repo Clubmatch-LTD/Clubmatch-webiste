@@ -103,11 +103,7 @@ export default function MembershipPage({
     <>
       <SubBanner
         title={oHeader?.sTitle || (publishedSeo?.title as string)}
-        description={
-          oHeader?.sSubtitle ||
-          (publishedSeo?.sClubName as string) ||
-          'Woburn Sands Tennis Club'
-        }
+        description={oHeader?.sSubtitle}
         bgImage={oHeader?.oHeaderImage?.sFileUrl}
       />
 

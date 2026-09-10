@@ -1,8 +1,15 @@
 'use client'
 
 import { useEffect, useMemo, useRef } from 'react'
-  import Button from '@/shared/ui/button'
-import { asString, resolveVideoSource } from '@/shared/utils/seo-utils'
+import Button from '@/shared/ui/button'
+import {
+  asString,
+  getYouTubePosterUrl,
+  getYouTubeVideoId,
+  resolveVideoSource,
+  toYouTubeNoCookieEmbed
+} from '@/shared/utils/seo-utils'
+import { useCookieConsent } from '@/shared/components/cookieConsent/CookieConsentProvider'
 
 function withAutoplayParams(url: string) {
   const videoId = url.match(/embed\/([^?&/]+)/)?.[1]
@@ -26,15 +33,23 @@ function withAutoplayParams(url: string) {
 
 function VideoSection({ homeData }: { homeData?: any }) {
   const videoRef = useRef<HTMLVideoElement | null>(null)
+  const { mediaAllowed, openBanner, setChooseOpen } = useCookieConsent()
 
   const sTitle = asString(homeData?.sTitle)
   const sLearnMoreUrl = asString(homeData?.sLearnMoreUrl)
   const { embedUrl, directUrl } = resolveVideoSource(homeData)
   const hasVideo = !!(embedUrl || directUrl)
-  const iframeSrc = useMemo(
-    () => (embedUrl ? withAutoplayParams(embedUrl) : null),
-    [embedUrl]
-  )
+  const youtubeId = embedUrl ? getYouTubeVideoId(embedUrl) : null
+  const posterUrl = youtubeId ? getYouTubePosterUrl(youtubeId) : null
+  const needsMediaConsent = !!embedUrl
+
+  const iframeSrc = useMemo(() => {
+    if (!embedUrl || !mediaAllowed) return null
+    const privacyEmbed = embedUrl.includes('youtube')
+      ? toYouTubeNoCookieEmbed(embedUrl)
+      : embedUrl
+    return withAutoplayParams(privacyEmbed)
+  }, [embedUrl, mediaAllowed])
 
   useEffect(() => {
     const el = videoRef.current
@@ -59,6 +74,11 @@ function VideoSection({ homeData }: { homeData?: any }) {
   }, [directUrl])
 
   if (!sTitle && !sLearnMoreUrl && !hasVideo) return null
+
+  const openCookieChoices = () => {
+    setChooseOpen(true)
+    openBanner()
+  }
 
   return (
     <section className="main-bg pt-[128px] mxs:pt-10 main-2-shape relative">
@@ -91,7 +111,7 @@ function VideoSection({ homeData }: { homeData?: any }) {
               />
               <div className="absolute inset-0 z-[1]" aria-hidden />
             </>
-          ) : (
+          ) : directUrl ? (
             <video
               ref={videoRef}
               className="w-full h-full absolute inset-0 object-cover rounded-t-[48px] mxs:rounded-t-2xl pointer-events-none"
@@ -100,9 +120,32 @@ function VideoSection({ homeData }: { homeData?: any }) {
               loop
               controls={false}
               preload="auto"
-              src={directUrl || undefined}
+              src={directUrl}
             />
-          )}
+          ) : needsMediaConsent ? (
+            <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 px-4 text-center">
+              {posterUrl ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={posterUrl}
+                  alt=""
+                  className="absolute inset-0 w-full h-full object-cover opacity-50"
+                />
+              ) : null}
+              <div className="relative z-[1]">
+                <p className="text-white font-medium mb-4 max-w-md">
+                  This video needs cookie consent before it can load.
+                </p>
+                <button
+                  type="button"
+                  onClick={openCookieChoices}
+                  className="rounded-full bg-white/20 backdrop-blur-sm text-white font-bold text-sm py-3 px-6 hover:bg-white hover:text-[color:var(--primary-color)] transition-colors"
+                >
+                  Open cookie settings
+                </button>
+              </div>
+            </div>
+          ) : null}
         </div>
       ) : null}
     </section>

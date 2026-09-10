@@ -19,10 +19,14 @@ function CourtContent({ homeData }: { homeData?: any }) {
         return (
           <div
             key={item.sId || item._id || title || index}
-            className="flex items-center even:flex-row-reverse mxs:flex-col mxs:even:flex-col"
+            className="flex items-stretch even:flex-row-reverse mxs:flex-col mxs:even:flex-col"
           >
             {imageUrl ? (
-              <div className="w-1/2 msm:min-h-[400px] mxs:pt-[55%] mxs:w-full relative">
+              <div
+                className={`w-1/2 relative mxs:pt-[55%] mxs:w-full ${
+                  title || description ? '' : 'msm:min-h-[400px]'
+                }`}
+              >
                 <div className="absolute inset-0 main-bg z-10 opacity-25" />
                 <MyImage
                   src={imageUrl}
@@ -35,7 +39,9 @@ function CourtContent({ homeData }: { homeData?: any }) {
             ) : null}
             {(title || description) && (
               <div
-                className={`${imageUrl ? 'w-1/2' : 'w-full max-w-[960px] mx-auto'} py-5 px-24 sm:px-6 mxs:w-full mxs:p-5`}
+                className={`${
+                  imageUrl ? 'w-1/2' : 'w-full max-w-[960px] mx-auto'
+                } py-[128px] px-[128px] mxs:w-full mxs:p-5`}
               >
                 {title ? (
                   <h3 className="text-[28px]/[36px] mxs:text-xl font-bold heading-font uppercase text-neturalDark">
@@ -43,7 +49,7 @@ function CourtContent({ homeData }: { homeData?: any }) {
                   </h3>
                 ) : null}
                 {title && description ? (
-                  <div className="h-0.5 w-8 main-bg rounded-sm my-8 sm:my-4 mxs:my-4" />
+                  <div className="h-0.5 w-8 main-bg rounded-sm my-8 mxs:my-4" />
                 ) : null}
                 {description ? (
                   <RichTextContent content={description} className="text-neturalMedium" />

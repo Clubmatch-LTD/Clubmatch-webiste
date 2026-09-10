@@ -9,6 +9,7 @@ import Badge from '@/shared/ui/badge'
 import footerBg from '@/assets/images/footer-icon.png'
 import LocationSection from '@/shared/components/home/locationSection'
 import { NEXT_PUBLIC_PRIVACY_LINK, NEXT_PUBLIC_TERMS_LINK } from '@/shared/constant'
+import { useCookieConsent } from '@/shared/components/cookieConsent/CookieConsentProvider'
 
 type Sponsor = {
   sLogoUrl?: string | null
@@ -54,6 +55,7 @@ function Footer({
   const resolvedSocialLinks = (socialLinks || []).filter((item) => item?.sName?.trim() && item?.sLink?.trim())
   const resolvedSponsors = (sponsors || []).filter((sponsor) => !!sponsor?.sLogoUrl?.trim())
   const showContactBlock = !!(sCta || sContactEmail)
+  const { openBanner } = useCookieConsent()
 
   return (
     <>
@@ -162,9 +164,13 @@ function Footer({
               </div>
             )}
             <div className="gap-6 flex items-center mxs:justify-center">
-              <Link href="" className="text-[#4F595980] font-medium text-xs">
+              <button
+                type="button"
+                onClick={() => openBanner()}
+                className="text-[#4F595980] font-medium text-xs hover:text-neturalMedium transition-colors"
+              >
                 ⚙ Cookie Settings
-              </Link>
+              </button>
               <Link
                 href={NEXT_PUBLIC_PRIVACY_LINK}
                 target="_blank"

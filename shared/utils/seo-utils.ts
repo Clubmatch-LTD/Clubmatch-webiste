@@ -65,7 +65,9 @@ export function pickFirstString(
 export function getVideoEmbedUrl(url: unknown): string | null {
   const value = asString(url)
   if (!value) return null
-  if (value.includes('youtube.com/embed/')) return value
+  if (value.includes('youtube.com/embed/') || value.includes('youtube-nocookie.com/embed/')) {
+    return value
+  }
   if (value.includes('player.vimeo.com/video/')) return value
   const youtubeShortMatch = value.match(/youtu\.be\/([^?&/]+)/)
   if (youtubeShortMatch) {
@@ -78,6 +80,27 @@ export function getVideoEmbedUrl(url: unknown): string | null {
   const vimeoMatch = value.match(/vimeo\.com\/(\d+)/)
   if (vimeoMatch) return `https://player.vimeo.com/video/${vimeoMatch[1]}`
   return null
+}
+
+export function getYouTubeVideoId(url: unknown): string | null {
+  const value = asString(url)
+  if (!value) return null
+  const embedMatch = value.match(/(?:youtube\.com|youtube-nocookie\.com)\/embed\/([^?&/]+)/)
+  if (embedMatch) return embedMatch[1]
+  const shortMatch = value.match(/youtu\.be\/([^?&/]+)/)
+  if (shortMatch) return shortMatch[1]
+  const watchMatch = value.match(/[?&]v=([^&]+)/)
+  if (watchMatch) return watchMatch[1]
+  return null
+}
+
+export function getYouTubePosterUrl(videoId: string) {
+  return `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`
+}
+
+/** Privacy-friendlier host; still only load after media consent. */
+export function toYouTubeNoCookieEmbed(embedUrl: string) {
+  return embedUrl.replace('youtube.com/embed/', 'youtube-nocookie.com/embed/')
 }
 
 export function isDirectVideoFile(url: unknown): boolean {

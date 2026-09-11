@@ -63,7 +63,7 @@ async function Layout({ children }: { children: React.ReactNode }) {
         menuItems={menuItems}
         isLoggedIn={isLoggedIn}
       />
-      <div className="min-h-screen mxs:min-h-fit">{children}</div>
+      <main className="min-h-screen mxs:min-h-fit grow">{children}</main>
       <Footer
         logo={oDesign.sClubColorLogo || oDesign.sClubMonoLogo}
         hideLtaLogo={oDesign.bHideLtaFooterLogo === 'true'}

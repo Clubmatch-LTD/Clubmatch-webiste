@@ -135,6 +135,7 @@ export default function BookingPage({
                   <CustomSelect
                     options={courtOptions}
                     value={selectedOption}
+                    customLabel="Court"
                     placeholder="Select court"
                     className="w-[256px]"
                     isLoading={isLoadingCourts}

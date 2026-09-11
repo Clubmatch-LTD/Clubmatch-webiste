@@ -128,7 +128,7 @@ function Header({
             </div>
 
             {/* Left slide panel */}
-            <aside
+            <div
                 id="site-menu"
                 className={[
                     "fixed top-0 left-0 h-full w-full after:absolute after:inset-0 after:bg-gradient-overlay after:w-full after:h-full after:opacity-85 z-[60] shadow-2xl transition-transform duration-300 ease-out pt-[128px] mxs:pt-20",
@@ -203,7 +203,7 @@ function Header({
                         </div>
                     )}
                 </div>
-            </aside>
+            </div>
             {showLogo && siteLogo ? (
                 <Link
                     href={siteSegment ? `/${siteSegment}` : "/"}

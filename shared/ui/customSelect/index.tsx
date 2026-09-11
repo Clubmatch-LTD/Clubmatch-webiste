@@ -36,6 +36,8 @@ const CustomMenuList = (props: any) => {
 }
 const CustomSelect = forwardRef<any, CustomSelectProps>(({ className, parentClass, size, customLabel, components, ...rest }, ref) => {
   const instanceId = useId()
+  const inputId = rest.inputId || `${instanceId}-input`
+  const labelId = `${instanceId}-label`
   const [isFocused, setIsFocused] = useState(false)
   const [hasValue, setHasValue] = useState(false)
 
@@ -49,7 +51,7 @@ const CustomSelect = forwardRef<any, CustomSelectProps>(({ className, parentClas
 
   const handleChange = (selectedOption: unknown) => {
     setHasValue(!!selectedOption)
-    rest?.onChange(selectedOption)
+    rest?.onChange?.(selectedOption)
   }
 
   useEffect(() => {
@@ -63,6 +65,8 @@ const CustomSelect = forwardRef<any, CustomSelectProps>(({ className, parentClas
     >
       {customLabel && (
         <label
+          id={labelId}
+          htmlFor={inputId}
           className={`custom-lable absolute pointer-events-none top-1/2 start-4 z-2 ${isFocused ? 'text-primary' : className?.includes('select-light') ? 'text-neutral-white/70' : 'text-light-400'} ${isFocused || hasValue ? '-translate-y-full pb-1 text-base' : 'text-lg -translate-y-1/2'}`}
         >
           {customLabel}
@@ -77,12 +81,10 @@ const CustomSelect = forwardRef<any, CustomSelectProps>(({ className, parentClas
         onFocus={handleFocus}
         onBlur={handleBlur}
         menuPlacement="auto"
-        // menuIsOpen
-        // captureMenuScroll={true}
-        // onMenuScrollToBottom
-        // onMenuScrollToBottom={}
-        // getOptionLabel={}
         {...rest}
+        inputId={inputId}
+        aria-labelledby={customLabel ? labelId : rest['aria-labelledby']}
+        aria-label={customLabel ? undefined : rest['aria-label']}
         onChange={handleChange}
       />
     </div>

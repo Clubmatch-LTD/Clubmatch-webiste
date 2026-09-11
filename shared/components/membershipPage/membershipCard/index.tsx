@@ -49,7 +49,7 @@ function MembershipCard({
   plan: MembershipPlan
   joinHref?: string
 }) {
-  const isWaitlist = !!(plan.bWaitingList || plan.bIsFull)
+  const isWaitlist = !!(plan.bIsFull && plan.bWaitingList)
   const typeLabel = PLAN_TYPE_LABEL[plan.ePlanType || ''] || 'Membership'
   const meta = formatMeta(plan)
 

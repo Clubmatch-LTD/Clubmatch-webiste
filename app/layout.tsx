@@ -1,9 +1,8 @@
 import type { Metadata } from "next";
-import Script from "next/script";
 import { getPageMetadata, getPageSeo } from '@/shared/lib/seo'
 import "../assets/scss/global.scss";
 import { FONT_VAR_BY_KEY, normalizeFontKey } from '@/shared/theme/font-constants'
-import { gabarito, rethinkSans, satoshi, inter, manrope, workSans, nunitoSans, openSans, lato, merriweather } from '@/app/fonts'
+import { getSelectedFontVariableClasses } from '@/app/fonts'
 import Preloader from "@/shared/ui/loaders/Preloader";
 import Providers from "./providers";
 
@@ -26,8 +25,16 @@ export default async function RootLayout({
   const primaryColor = oDesign.sPrimaryColor || '#5a8408'
   const headingFontKey = oDesign.eHeadingFont || ''
   const bodyFontKey = oDesign.eBodyFont || ''
-  const headingFont = FONT_VAR_BY_KEY[normalizeFontKey(headingFontKey)] || ''
-  const bodyFont = FONT_VAR_BY_KEY[normalizeFontKey(bodyFontKey)] || ''
+  const headingFont =
+    FONT_VAR_BY_KEY[normalizeFontKey(headingFontKey)] ||
+    'system-ui, sans-serif'
+  const bodyFont =
+    FONT_VAR_BY_KEY[normalizeFontKey(bodyFontKey)] ||
+    'system-ui, sans-serif'
+  const fontVariableClasses = getSelectedFontVariableClasses(
+    headingFontKey,
+    bodyFontKey
+  )
   const favicon = oDesign.sFavicon || '/favicon.ico'
   const sGoogleAnalyticsId = oDesign.sGoogleAnalyticsId
 
@@ -35,7 +42,7 @@ export default async function RootLayout({
     <html
       lang="en"
       suppressHydrationWarning
-      className={`${gabarito.variable} ${rethinkSans.variable} ${satoshi.variable} ${inter.variable} ${manrope.variable} ${workSans.variable} ${nunitoSans.variable} ${openSans.variable} ${lato.variable} ${merriweather.variable} h-full antialiased`}
+      className={`${fontVariableClasses} h-full antialiased`}
     >
       <head suppressHydrationWarning>
         <link rel="icon" href={favicon} sizes="any" />
@@ -53,24 +60,8 @@ export default async function RootLayout({
         `}</style>
       </head>
       <body className="min-h-full flex flex-col" suppressHydrationWarning>
-        {sGoogleAnalyticsId && (
-          <>
-            <Script
-              src={`https://www.googletagmanager.com/gtag/js?id=${sGoogleAnalyticsId}`}
-              strategy="afterInteractive"
-            />
-            <Script id="google-analytics" strategy="afterInteractive">
-              {`
-                window.dataLayer = window.dataLayer || [];
-                function gtag(){dataLayer.push(arguments);}
-                gtag('js', new Date());
-                gtag('config', '${sGoogleAnalyticsId}');
-              `}
-            </Script>
-          </>
-        )}
         <Preloader />
-        <Providers>
+        <Providers googleAnalyticsId={sGoogleAnalyticsId}>
           {children}
         </Providers>
       </body>

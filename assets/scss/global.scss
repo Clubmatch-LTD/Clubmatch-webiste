@@ -20,11 +20,14 @@ html, body {
     top: 0;
     left: 0;
     width: 100%;
+    // Cap height so long banner copy does not zoom the tennis-ball artwork
     height: 100%;
+    max-height: 100vh;
     background-image: url('../images/shape-back.png');
     background-size: cover;
-    background-position: center;
+    background-position: center top;
     background-repeat: no-repeat;
+    pointer-events: none;
 }
 .main-2-shape::before{
     content: '';
@@ -37,4 +40,49 @@ html, body {
     background-size: 100% 100%;
     background-position: center;
     background-repeat: no-repeat;
+    pointer-events: none;
+}
+
+.rich-text-content {
+    @apply relative z-10 text-base font-medium break-words;
+
+    p {
+        @apply mb-4 last:mb-0;
+    }
+
+    ul,
+    ol {
+        // Override inherited text-center (intro blocks) so markers sit next to text
+        @apply mb-4 last:mb-0 pl-6 text-left;
+        list-style-position: outside;
+    }
+
+    ul {
+        @apply list-disc;
+    }
+
+    ol {
+        @apply list-decimal;
+    }
+
+    li {
+        @apply mb-2 last:mb-0 text-left;
+    }
+
+    a {
+        @apply underline underline-offset-2 cursor-pointer pointer-events-auto;
+        color: var(--primary-color);
+    }
+
+    strong {
+        @apply font-semibold;
+    }
+
+    &--inverse {
+        @apply text-white/75;
+
+        a {
+            @apply text-white/90 hover:text-white;
+        }
+    }
 }

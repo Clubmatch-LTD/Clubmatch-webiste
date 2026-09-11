@@ -8,9 +8,9 @@ import EmptyState from '@/shared/components/emptyState'
 import MembershipCard, {
   type MembershipPlan,
 } from '@/shared/components/membershipPage/membershipCard'
-import { clubWebsiteApi } from '@/api/club-website/club-website.api'
+import { getMembershipPlansByClubIdAction } from '@/api/club-website/club-website.actions'
 import Loader from '@/shared/ui/loaders'
-
+import { PORTAL_URL } from '@/shared/constant'
 
 type PublishedSeo = Record<string, unknown> & {
   iClubId?: string
@@ -57,7 +57,7 @@ export default function MembershipPage({
     enabled: !!iClubId && bShowAvailableMemberships,
     initialPageParam: 0,
     queryFn: async ({ pageParam }) => {
-      const res = await clubWebsiteApi.getMembershipPlansByClubId({
+      const res = await getMembershipPlansByClubIdAction({
         iClubId: iClubId!,
         nSkip: pageParam,
         nLimit: 10,
@@ -103,11 +103,7 @@ export default function MembershipPage({
     <>
       <SubBanner
         title={oHeader?.sTitle || (publishedSeo?.title as string)}
-        description={
-          oHeader?.sSubtitle ||
-          (publishedSeo?.sClubName as string) ||
-          'Woburn Sands Tennis Club'
-        }
+        description={oHeader?.sSubtitle}
         bgImage={oHeader?.oHeaderImage?.sFileUrl}
       />
 
@@ -120,7 +116,7 @@ export default function MembershipPage({
             {bShowClubmatchButton && (
               <Button
                 className="mxs:w-full"
-                href={'https://portal.clubmatch.co.uk/settings/my-clubs' as any}
+                href={`${PORTAL_URL}/settings/my-clubs-details/${iClubId}` as any}
                 target="_blank"
                 rel="noopener noreferrer"
               >
@@ -144,7 +140,7 @@ export default function MembershipPage({
                 <MembershipCard
                   key={plan._id}
                   plan={plan}
-                  joinHref={'https://portal.clubmatch.co.uk/settings/my-clubs' as any}
+                  joinHref={`${PORTAL_URL}/settings/my-clubs-details/${iClubId}?iPlanId=${plan._id}` as any}
                 />
               ))}
 

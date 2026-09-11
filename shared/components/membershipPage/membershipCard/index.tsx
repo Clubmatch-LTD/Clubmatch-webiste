@@ -30,19 +30,16 @@ function formatPrice(value?: number) {
   return `£${amount.toFixed(2)}`
 }
 
-function formatAudience(plan: MembershipPlan) {
+function formatMeta(plan: MembershipPlan) {
   const genders = (plan.aGender || [])
     .map((g) => GENDER_LABEL[g] || g)
     .filter(Boolean)
-
-  let audience = 'Adults'
-  if (genders.length === 1) audience = genders[0]
-  else if (genders.length > 1) audience = 'Adults'
+  const genderLabel = genders.length > 0 ? genders.join(' / ') : null
 
   const capacity =
     typeof plan.nCapacity === 'number' ? `Up to ${plan.nCapacity} members` : null
 
-  return [capacity, audience].filter(Boolean).join(' • ')
+  return [capacity, genderLabel].filter(Boolean).join(' • ')
 }
 
 function MembershipCard({
@@ -52,9 +49,9 @@ function MembershipCard({
   plan: MembershipPlan
   joinHref?: string
 }) {
-  const isWaitlist = !!(plan.bWaitingList || plan.bIsFull)
+  const isWaitlist = !!(plan.bIsFull && plan.bWaitingList)
   const typeLabel = PLAN_TYPE_LABEL[plan.ePlanType || ''] || 'Membership'
-  const meta = formatAudience(plan)
+  const meta = formatMeta(plan)
 
   return (
     <div

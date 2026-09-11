@@ -31,7 +31,7 @@ function FilesPage({
         <>
             <SubBanner
                 title={oHeader?.sTitle || (publishedSeo?.title as string)}
-                description={oHeader?.sSubtitle || (publishedSeo?.sClubName as string) || 'Woburn Sands Tennis Club'}
+                description={oHeader?.sSubtitle}
                 bgImage={oHeader?.oHeaderImage?.sFileUrl}
             />
             <div className='max-w-[944px] mx-auto px-3 py-[128px] mxs:py-10'>
@@ -39,23 +39,27 @@ function FilesPage({
                     <div className='grid ssm:grid-cols-2 gap-4'>
                         {aFiles.map((file, index) => {
                             const sFileUrl = withS3Prefix(file.sFileUrl)
+                            const fileName = file.sFileName || 'File'
                             return (
                                 <div
                                     key={file.sId || index}
-                                    className='flex items-center gap-4 justify-between bg-light-100 rounded-lg px-6 py-4'
+                                    className='flex items-center gap-4 justify-between bg-light-100 rounded-lg px-6 py-4 min-w-0 overflow-hidden'
                                 >
-                                    <div className='min-w-0'>
-                                        <p className='text-neutral-dark font-medium truncate'>{file.sFileName || 'File'}</p>
+                                    <div className='min-w-0 flex-1 overflow-hidden'>
+                                        <p className='text-neutral-dark font-medium truncate' title={fileName}>
+                                            {fileName}
+                                        </p>
                                         <p className='text-neutral-light text-sm mt-1'>{formatFileSize(file.sFileSize)}</p>
                                     </div>
-                                    <div className='flex items-center gap-2 flex-shrink-0'>
+                                    <div className='flex items-center gap-2 shrink-0'>
                                         {sFileUrl && (
                                             <>
                                                 <a
                                                     href={sFileUrl}
                                                     target='_blank'
                                                     rel='noopener noreferrer'
-                                                    aria-label={`View ${file.sFileName}`}
+                                                    aria-label={`View ${fileName}`}
+                                                    title={fileName}
                                                     className='w-8 h-8 flex items-center justify-center rounded-full bg-light-200 text-neutral-medium hover:text-primary transition-colors'
                                                 >
                                                     <span className='w-4 h-4 block'><IconEye /></span>
@@ -63,7 +67,7 @@ function FilesPage({
                                                 <a
                                                     href={sFileUrl}
                                                     download={file.sFileName}
-                                                    aria-label={`Download ${file.sFileName}`}
+                                                    aria-label={`Download ${fileName}`}
                                                     className='w-8 h-8 flex items-center justify-center rounded-full bg-light-200 text-neutral-medium hover:text-primary transition-colors'
                                                 >
                                                     <span className='w-4 h-4 block'><IconDownload /></span>

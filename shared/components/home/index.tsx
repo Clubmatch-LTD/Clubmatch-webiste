@@ -21,6 +21,7 @@ function Home({
     const aModules = oPage?.aModules || []
     const oDesign = (publishedSeo?.oDesign || {}) as Design
     const sClubLogo = oDesign.sClubMonoLogo || oDesign.sClubColorLogo
+    const clubName = (publishedSeo?.sClubName as string) || ''
 
     return (
         <>
@@ -29,6 +30,7 @@ function Home({
                 homeData={oPage}
                 bgImage={oPage?.oHeader?.oHeaderImage?.sFileUrl}
                 sClubLogo={sClubLogo}
+                clubName={clubName}
             />
             {aModules.map((module: any) => {
                 if (!module.bEnabled) return null

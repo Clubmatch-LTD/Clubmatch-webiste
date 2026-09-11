@@ -28,7 +28,7 @@ function CourtAvailabilityCalendar({
 
   if (isLoading) {
     return (
-      <div className="min-h-[520px] flex items-center justify-center text-neutralLight font-medium">
+      <div className="min-h-[520px] flex items-center justify-center text-neturalMedium font-medium" role="status">
         Loading court availability…
       </div>
     )
@@ -36,7 +36,7 @@ function CourtAvailabilityCalendar({
 
   if (!grid || !grid.timeSlots.length) {
     return (
-      <div className="min-h-[520px] flex items-center justify-center text-neutralLight font-medium">
+      <div className="min-h-[520px] flex items-center justify-center text-neturalMedium font-medium">
         No availability to display.
       </div>
     )
@@ -49,69 +49,101 @@ function CourtAvailabilityCalendar({
           isFetching ? 'opacity-60 pointer-events-none' : ''
         }`}
       >
-        <div className="grid grid-cols-9 border-b border-light200 bg-white">
-          <div className="bg-white" />
-          {grid.dayColumns.map((day, idx) => (
-            <div
-              key={idx}
-              className="px-3 py-[18px] font-bold text-sm text-center text-neutralLight border-l border-light200 bg-white"
-            >
-              {day?.label || ''}
-            </div>
-          ))}
-          <div className="border-l border-light200 bg-white" />
-        </div>
+        <div
+          className="max-h-[520px] overflow-y-auto overscroll-contain focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-inset"
+          tabIndex={0}
+          role="region"
+          aria-label="Court availability schedule"
+        >
+          <table className="w-full border-collapse">
+            <caption className="sr-only">
+              Court availability by day and time. Green cells are available; red cells are unavailable.
+            </caption>
+            <thead className="sticky top-0 z-[2] bg-white">
+              <tr className="border-b border-light200">
+                <th scope="col" className="bg-white w-[11%] p-0">
+                  <span className="sr-only">Time</span>
+                </th>
+                {grid.dayColumns.map((day, idx) => (
+                  <th
+                    key={idx}
+                    scope="col"
+                    className="px-3 py-[18px] font-bold text-sm text-center text-neturalDark border-l border-light200 bg-white"
+                  >
+                    {day?.label || ''}
+                  </th>
+                ))}
+                <th scope="col" className="border-l border-light200 bg-white w-[11%] p-0">
+                  <span className="sr-only">Time</span>
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {grid.timeSlots.map((startMinutes) => {
+                const timeLabel = formatMinutesToHHMM(startMinutes)
 
-        <div className="max-h-[520px] overflow-y-auto overscroll-contain">
-          {grid.timeSlots.map((startMinutes) => {
-            const timeLabel = formatMinutesToHHMM(startMinutes)
+                return (
+                  <tr key={startMinutes}>
+                    <th
+                      scope="row"
+                      className="sticky left-0 z-[1] px-2 py-2.5 font-semibold text-sm text-center text-neturalDark border-t border-light200 bg-white"
+                    >
+                      {timeLabel}
+                    </th>
 
-            return (
-              <div key={startMinutes} className="grid grid-cols-9">
-                <div className="sticky left-0 z-[1] px-2 py-2.5 font-semibold text-sm text-center text-neutralLight border-t border-light200 bg-white">
-                  {timeLabel}
-                </div>
+                    {grid.dayColumns.map((day, dayColIdx) => {
+                      if (!day) {
+                        return (
+                          <td
+                            key={dayColIdx}
+                            className="p-0 min-h-[40px] border-t border-l border-light200 bg-danger100"
+                          >
+                            <span className="sr-only">No day</span>
+                          </td>
+                        )
+                      }
 
-                {grid.dayColumns.map((day, dayColIdx) => {
-                  if (!day) {
-                    return (
-                      <div
-                        key={dayColIdx}
-                        className="p-2 min-h-[40px] border-t border-l border-light200 bg-danger100"
-                      />
-                    )
-                  }
-
-                  const available = isSlotAvailable(
-                    grid,
-                    day,
-                    startMinutes,
-                    selectedCourtId
-                  )
-
-                  return (
-                    <div
-                      key={dayColIdx}
-                      className={`p-2 min-h-[40px] border-t border-l border-light200 transition-colors ${
-                        available ? 'bg-primary500' : 'bg-danger100'
-                      }`}
-                      aria-label={`${day.label} ${timeLabel} ${
+                      const available = isSlotAvailable(
+                        grid,
+                        day,
+                        startMinutes,
+                        selectedCourtId
+                      )
+                      const slotLabel = `${day.label} ${timeLabel} ${
                         available ? 'available' : 'unavailable'
-                      }`}
-                    />
-                  )
-                })}
+                      }`
 
-                <div className="sticky right-0 z-[1] px-2 py-2.5 font-semibold text-sm text-center text-neutralLight border-t border-l border-light200 bg-white">
-                  {timeLabel}
-                </div>
-              </div>
-            )
-          })}
+                      return (
+                        <td
+                          key={dayColIdx}
+                          className="p-0 border-t border-l border-light200"
+                        >
+                          <button
+                            type="button"
+                            aria-label={slotLabel}
+                            className={`block w-full min-h-[40px] p-2 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-neturalDark ${
+                              available ? 'bg-primary500' : 'bg-danger100'
+                            }`}
+                          />
+                        </td>
+                      )
+                    })}
+
+                    <td
+                      aria-hidden="true"
+                      className="sticky right-0 z-[1] px-2 py-2.5 font-semibold text-sm text-center text-neturalDark border-t border-l border-light200 bg-white"
+                    >
+                      {timeLabel}
+                    </td>
+                  </tr>
+                )
+              })}
+            </tbody>
+          </table>
         </div>
       </div>
       {isFetching && (
-        <div className="absolute inset-0 flex items-center justify-center">
+        <div className="absolute inset-0 flex items-center justify-center" aria-live="polite">
           <span className="text-sm font-medium text-neturalMedium bg-white/90 px-4 py-2 rounded-full">
             Updating…
           </span>

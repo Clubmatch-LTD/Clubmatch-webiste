@@ -2,6 +2,7 @@ import SubBanner from '@/shared/components/subBanner'
 import CourtContent from '@/shared/components/home/courtContent'
 import VideoSection from '@/shared/components/home/videoSection'
 import EmptyState from '@/shared/components/emptyState'
+import RichTextContent from '@/shared/ui/richTextContent'
 
 type PublishedSeo = Record<string, unknown>
 
@@ -22,7 +23,11 @@ function CustomPage({
 
     const intro = introModule?.oPayload || {}
     const hasIntro = introModule?.bEnabled !== false && !!(intro?.sTitle || intro?.sSubtitle || intro?.sDescription)
-    const hasSections = sectionsModule?.bEnabled !== false && (sectionsModule?.oPayload?.aItems?.length > 0)
+    const hasSections =
+      sectionsModule?.bEnabled !== false &&
+      (sectionsModule?.oPayload?.aItems || []).some(
+        (item: any) => item?.sTitle?.trim() || item?.sDescription?.trim() || item?.oImage?.sFileUrl
+      )
     const videoPayload = videoModule?.oPayload
     const hasVideo = videoModule?.bEnabled !== false && !!(
         videoPayload?.sVideoUrl?.trim() ||
@@ -35,8 +40,8 @@ function CustomPage({
     return (
         <>
             <SubBanner
-                title={oHeader?.sTitle || (publishedSeo?.title as string)}
-                description={oHeader?.sSubtitle || (publishedSeo?.sClubName as string) || 'Woburn Sands Tennis Club'}
+                title={oHeader?.sTitle || (publishedSeo?.sClubName as string)}
+                description={oHeader?.sSubtitle}
                 bgImage={oHeader?.oHeaderImage?.sFileUrl}
             />
             {hasIntro && (
@@ -51,11 +56,12 @@ function CustomPage({
                             {intro.sSubtitle}
                         </p>
                     )}
-                    {intro?.sDescription?.split('\n')?.filter((line: string) => line?.trim() !== '').map((line: string, idx: number) => (
-                        <p className="text-neturalMedium text-base font-medium mt-4 break-words" key={idx}>
-                            {line}
-                        </p>
-                    ))}
+                    {intro?.sDescription && (
+                        <RichTextContent
+                            content={intro.sDescription}
+                            className="text-neturalMedium mt-4"
+                        />
+                    )}
                 </div>
             )}
 

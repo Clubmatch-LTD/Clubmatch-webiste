@@ -3,7 +3,7 @@ import notFoundArt from '@/assets/images/404-art.png'
 
 function NotFoundPage({ homeHref = '/' }: { homeHref?: string }) {
     return (
-        <section className="min-h-screen flex flex-col items-center justify-center px-3 py-16 text-center">
+        <main className="min-h-screen flex flex-col items-center justify-center px-3 py-16 text-center">
             <MyImage
                 src={notFoundArt}
                 alt="404"
@@ -23,7 +23,7 @@ function NotFoundPage({ homeHref = '/' }: { homeHref?: string }) {
             >
                 Go back to home
             </a>
-        </section>
+        </main>
     )
 }
 

@@ -7,7 +7,11 @@ export function asString(value: unknown): string | null {
 export function withS3Prefix(path: unknown): string | null {
   const sPath = asString(path)
   if (!sPath) return null
-  if (sPath.startsWith('http') || sPath.startsWith('//') || sPath.startsWith('data:')) {
+  if (
+    sPath.startsWith('http') ||
+    sPath.startsWith('//') ||
+    sPath.startsWith('data:')
+  ) {
     return sPath
   }
   return `${NEXT_PUBLIC_S3_PREFIX.replace(/\/+$/, '')}/${sPath.replace(/^\/+/, '')}`
@@ -15,12 +19,12 @@ export function withS3Prefix(path: unknown): string | null {
 
 export function asKeywords(value: unknown): string[] {
   if (Array.isArray(value)) {
-    return value.map((item) => asString(item)).filter(Boolean) as string[]
+    return value.map(item => asString(item)).filter(Boolean) as string[]
   }
   if (typeof value === 'string' && value.trim()) {
     return value
       .split(',')
-      .map((item) => item.trim())
+      .map(item => item.trim())
       .filter(Boolean)
   }
   return []
@@ -40,7 +44,8 @@ export function formatFileSize(nBytes: unknown): string {
     value /= 1024
     unitIndex += 1
   }
-  const rounded = unitIndex === 0 ? Math.round(value) : Math.round(value * 10) / 10
+  const rounded =
+    unitIndex === 0 ? Math.round(value) : Math.round(value * 10) / 10
   return `${rounded} ${units[unitIndex]}`
 }
 
@@ -57,10 +62,23 @@ export function pickFirstString(
   return undefined
 }
 
+/** Site settings URL segment → display name, e.g. forres-tennis-club → Forres Tennis Club */
+export function formatUrlSegmentName(segment: unknown): string {
+  const value = asString(segment)
+  if (!value) return ''
+  return value
+    .split(/[-_]+/)
+    .filter(Boolean)
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+    .join(' ')
+}
+
 export function getVideoEmbedUrl(url: unknown): string | null {
   const value = asString(url)
   if (!value) return null
-  if (value.includes('youtube.com/embed/')) return value
+  if (value.includes('youtube.com/embed/') || value.includes('youtube-nocookie.com/embed/')) {
+    return value
+  }
   if (value.includes('player.vimeo.com/video/')) return value
   const youtubeShortMatch = value.match(/youtu\.be\/([^?&/]+)/)
   if (youtubeShortMatch) {
@@ -75,14 +93,32 @@ export function getVideoEmbedUrl(url: unknown): string | null {
   return null
 }
 
+export function getYouTubeVideoId(url: unknown): string | null {
+  const value = asString(url)
+  if (!value) return null
+  const embedMatch = value.match(/(?:youtube\.com|youtube-nocookie\.com)\/embed\/([^?&/]+)/)
+  if (embedMatch) return embedMatch[1]
+  const shortMatch = value.match(/youtu\.be\/([^?&/]+)/)
+  if (shortMatch) return shortMatch[1]
+  const watchMatch = value.match(/[?&]v=([^&]+)/)
+  if (watchMatch) return watchMatch[1]
+  return null
+}
+
+export function getYouTubePosterUrl(videoId: string) {
+  return `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`
+}
+
+/** Privacy-friendlier host; still only load after media consent. */
+export function toYouTubeNoCookieEmbed(embedUrl: string) {
+  return embedUrl.replace('youtube.com/embed/', 'youtube-nocookie.com/embed/')
+}
+
 export function isDirectVideoFile(url: unknown): boolean {
   const value = asString(url)
   if (!value) return false
   return /\.(mp4|webm|ogg)(\?|$)/i.test(value)
 }
-
-const DEFAULT_VIDEO_URL =
-  'https://test-videos.co.uk/vids/bigbuckbunny/mp4/h264/1080/Big_Buck_Bunny_1080_10s_1MB.mp4'
 
 export function resolveVideoSource(payload?: {
   sVideoUrl?: string
@@ -90,11 +126,14 @@ export function resolveVideoSource(payload?: {
 }) {
   const linkUrl = asString(payload?.sVideoUrl)
   const legacyFileUrl = withS3Prefix(payload?.oVideo?.sFileUrl)
-  const url = linkUrl || legacyFileUrl || DEFAULT_VIDEO_URL
+  const url = linkUrl || legacyFileUrl
+  if (!url) {
+    return { embedUrl: null, directUrl: null }
+  }
   const embedUrl = getVideoEmbedUrl(url)
 
   return {
     embedUrl,
-    directUrl: embedUrl ? null : url,
+    directUrl: embedUrl ? null : url
   }
 }

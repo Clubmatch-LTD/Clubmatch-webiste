@@ -7,8 +7,9 @@ import Button from '@/shared/ui/button'
 import CustomSelect from '@/shared/ui/customSelect'
 import CourtAvailabilityCalendar from '@/shared/components/booking/courtAvailabilityCalendar'
 import EmptyState from '@/shared/components/emptyState'
-import { clubWebsiteApi } from '@/api/club-website/club-website.api'
+import { getCourtsByClubIdAction, getCourtAvailabilityByClubIdAction } from '@/api/club-website/club-website.actions'
 import type { CourtAvailabilityData } from '@/shared/components/booking/courtAvailabilityCalendar/utils'
+import { PORTAL_URL } from '@/shared/constant'
 
 type PublishedSeo = Record<string, unknown> & {
   iClubId?: string
@@ -52,7 +53,7 @@ export default function BookingPage({
     queryKey: ['club-courts', iClubId, isPreview],
     enabled: !!iClubId,
     queryFn: async () => {
-      const res = await clubWebsiteApi.getCourtsByClubId({
+      const res = await getCourtsByClubIdAction({
         iClubId: iClubId!,
         isPreview,
       })
@@ -78,7 +79,7 @@ export default function BookingPage({
     enabled: !!iClubId && !!selectedCourtId,
     placeholderData: keepPreviousData,
     queryFn: async () => {
-      const res = await clubWebsiteApi.getCourtAvailabilityByClubId({
+      const res = await getCourtAvailabilityByClubIdAction({
         iClubId: iClubId!,
         iCourtId: selectedCourtId,
         isPreview,
@@ -102,11 +103,7 @@ export default function BookingPage({
     <>
       <SubBanner
         title={oHeader?.sTitle || (publishedSeo?.title as string)}
-        description={
-          oHeader?.sSubtitle ||
-          (publishedSeo?.sClubName as string) ||
-          'Woburn Sands Tennis Club'
-        }
+        description={oHeader?.sSubtitle}
         bgImage={oHeader?.oHeaderImage?.sFileUrl}
       />
 
@@ -119,9 +116,7 @@ export default function BookingPage({
             {bShowClubmatchButton && (
             <Button
               className="mxs:w-full"
-              href={
-                'https://portal.clubmatch.co.uk/court-availability' as any
-              }
+              href={`${PORTAL_URL}/court-availability` as any}
               target="_blank"
               rel="noopener noreferrer"
             >
@@ -139,6 +134,7 @@ export default function BookingPage({
                   <CustomSelect
                     options={courtOptions}
                     value={selectedOption}
+                    customLabel="Court"
                     placeholder="Select court"
                     className="w-[256px]"
                     isLoading={isLoadingCourts}

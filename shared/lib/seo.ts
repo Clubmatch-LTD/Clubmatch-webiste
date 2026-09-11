@@ -187,6 +187,8 @@ export async function fetchPublishedClubWebsiteDesign({
     // Site Settings
     const sUrlSegment = asString(oSiteSettings?.oAddress?.sUrlSegment)
     if (sUrlSegment) result.sUrlSegment = sUrlSegment
+    const sShortUrlSegment = asString(oSiteSettings?.oAddress?.sShortUrlSegment)
+    if (sShortUrlSegment) result.sShortUrlSegment = sShortUrlSegment
 
     if (oLogoSettings?.bHideLtaFooterLogo !== undefined)
       result.bHideLtaFooterLogo = String(!!oLogoSettings.bHideLtaFooterLogo)
@@ -261,6 +263,32 @@ export async function fetchPublishedNavigation({
   }
 }
 
+/** Full-segment path for a page (never the short URL alias). */
+export function buildCanonicalPath(
+  sUrlSegment: string | null | undefined,
+  sSlug: string | null | undefined
+) {
+  const segment = asString(sUrlSegment)
+  if (!segment) return null
+  const slug = asString(sSlug)
+  if (!slug || slug === 'home') return `/${segment}`
+  return `/${segment}/${slug}`
+}
+
+export function buildPageTitle(params: {
+  adminTitle?: string | null
+  pageName?: string | null
+  clubName?: string | null
+  fallback?: string
+}) {
+  const adminTitle = asString(params.adminTitle)
+  if (adminTitle) return adminTitle
+  const pageName = asString(params.pageName)
+  const clubName = asString(params.clubName)
+  if (pageName && clubName) return `${pageName} - ${clubName}`
+  return pageName || clubName || asString(params.fallback) || 'Clubmatch'
+}
+
 // --- SEO PAYLOAD CONSTRUCTION ---
 export function getSeoPayload(
   seo: any,
@@ -273,7 +301,7 @@ export function getSeoPayload(
     return {
       nf: true,
       title: 'Not Found',
-      description: 'Page not found',
+      description: null,
       oDesign: design,
       aMenu: navigation?.aMenu || [],
       sSiteSegment
@@ -282,16 +310,27 @@ export function getSeoPayload(
   const oSeo = (
     seo?.oSeo && typeof seo.oSeo === 'object' ? seo.oSeo : {}
   ) as Record<string, unknown>
-  const title =
-    asString(oSeo?.sPageTitle) ||
-    asString(seo?.title) ||
-    asString(seo?.sTitle) ||
-    'Clubmatch'
+  // Club name from the full Site settings URL segment (not the short alias).
+  const sUrlSegment =
+    asString(seo?.oSiteSettings?.oAddress?.sUrlSegment) ||
+    asString(design?.sUrlSegment) ||
+    asString(sSiteSegment)
+  const sShortUrlSegment =
+    asString(seo?.oSiteSettings?.oAddress?.sShortUrlSegment) ||
+    asString(design?.sShortUrlSegment)
+  const sClubName = formatUrlSegmentName(sUrlSegment)
+  const pageName = asString(seo?.sTitle) || asString(seo?.title)
+  const title = buildPageTitle({
+    adminTitle: asString(oSeo?.sPageTitle),
+    pageName,
+    clubName: sClubName
+  })
+  // Empty SEO description → omit (never publish "Clubmatch").
   const description =
+    asString(oSeo?.sMetaDescription) ||
     asString(seo?.description) ||
     asString(seo?.sDescription) ||
-    asString(oSeo?.sMetaDescription) ||
-    'Clubmatch'
+    null
   const image = withS3Prefix(
     asString(seo?.image) ||
       asString(seo?.sOgImage) ||
@@ -302,21 +341,20 @@ export function getSeoPayload(
       design?.sClubMonoLogo
   )
   const keywords = asKeywords(seo?.keywords ?? oSeo?.keywords)
-  // Club name for empty headers comes from Site settings URL (oAddress.sUrlSegment)
-  const sUrlSegment =
-    asString(seo?.oSiteSettings?.oAddress?.sUrlSegment) ||
-    asString(design?.sUrlSegment) ||
-    asString(sSiteSegment)
-  const sClubName = formatUrlSegmentName(sUrlSegment)
+  const sSlug = asString(seo?.sSlug) || 'home'
+  const canonicalPath = buildCanonicalPath(sUrlSegment, sSlug)
 
   return {
     ...seo,
+    sSlug,
     title,
     description,
     keywords,
     image,
     sClubName,
     sUrlSegment,
+    sShortUrlSegment,
+    canonicalPath,
     oDesign: design,
     aMenu: navigation?.aMenu || [],
     sSiteSegment,
@@ -344,27 +382,50 @@ export async function getPageMetadata(defaultMetadata: {
   description?: string
 }): Promise<Metadata> {
   const seo = await getPageSeo<any>()
+  const headersList = await headers()
   const fallbackTitle = asString(defaultMetadata?.title) || 'Clubmatch'
-  const fallbackDescription =
-    asString(defaultMetadata?.description) || 'Clubmatch'
   if (!seo || seo?.nf || seo?.notFound) {
-    return { title: fallbackTitle, description: fallbackDescription }
+    return { title: fallbackTitle }
   }
+
   const title = asString(seo?.title) || fallbackTitle
-  const description = asString(seo?.description) || fallbackDescription
+  const description = asString(seo?.description)
   const image = asString(seo?.image)
   const keywords = Array.isArray(seo?.keywords) ? seo.keywords : []
-  const metadata: Metadata = { title, description }
+  const metadata: Metadata = { title }
+
+  if (description) metadata.description = description
   if (keywords.length > 0) metadata.keywords = keywords
+
+  const openGraph: NonNullable<Metadata['openGraph']> = { title }
+  const twitter: NonNullable<Metadata['twitter']> = {
+    card: 'summary_large_image',
+    title
+  }
+  if (description) {
+    openGraph.description = description
+    twitter.description = description
+  }
   if (image) {
-    metadata.openGraph = { title, description, images: [image] }
-    metadata.twitter = {
-      card: 'summary_large_image',
-      title,
-      description,
-      images: [image]
+    openGraph.images = [image]
+    twitter.images = [image]
+  }
+  metadata.openGraph = openGraph
+  metadata.twitter = twitter
+
+  const canonicalPath =
+    asString(seo?.canonicalPath) ||
+    buildCanonicalPath(seo?.sUrlSegment, seo?.sSlug)
+  const requestUrl = headersList.get('x-club-request-url')
+  if (canonicalPath && requestUrl) {
+    try {
+      const origin = new URL(requestUrl).origin
+      metadata.alternates = { canonical: `${origin}${canonicalPath}` }
+    } catch {
+      /* ignore bad request url */
     }
   }
+
   return metadata
 }
 

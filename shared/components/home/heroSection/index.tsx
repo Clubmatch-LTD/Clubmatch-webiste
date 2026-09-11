@@ -1,8 +1,11 @@
+import Image from 'next/image'
 import MyImage from '@/shared/ui/myImage'
 import RichTextContent from '@/shared/ui/richTextContent'
 import court from '@/assets/images/court.jpg'
 import ClubMatch from '@/assets/images/club-match.png'
 import { withS3Prefix } from '@/shared/utils/seo-utils'
+
+const HERO_SIZES = '(max-width: 768px) 100vw, (max-width: 1280px) 100vw, 1400px'
 
 function HeroSection({
   homeData,
@@ -33,13 +36,14 @@ function HeroSection({
     <section className="pt-[130px] mxs:pt-20 pb-16 mxs:pb-8 main-bg main-shape relative">
       <div className="px-16 mxsm:px-3">
         <div className="min-h-[calc(100vh-160px)] p-16 flex flex-col justify-between gap-5 rounded-2xl overflow-hidden relative after:absolute after:inset-0 after:bg-black/40 after:z-10 after:rounded-2xl after:w-full after:h-full">
-          <MyImage
+          <Image
             src={headerBg}
-            className="w-full h-full max-h-[100vh] object-cover object-top absolute top-0 left-0"
             alt="court"
-            height={1920}
-            width={1080}
+            fill
             priority
+            fetchPriority="high"
+            sizes={HERO_SIZES}
+            className="object-cover object-top"
           />
           <div className="absolute inset-0 main-bg z-10 rounded-2xl w-full h-full opacity-25" />
           <div />

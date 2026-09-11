@@ -22,6 +22,7 @@ async function Layout({ children }: { children: React.ReactNode }) {
   const iClubId = seo?.iClubId as string | undefined
   const isNotFound = !seo || seo.nf || seo.notFound
 
+  // Middleware already turned denied members-only into nf (generic meta + private cache).
   if (isNotFound) return children
 
   const cookieStore = await cookies()
@@ -45,6 +46,7 @@ async function Layout({ children }: { children: React.ReactNode }) {
     canAccessClub = userHasClubAccess(clubs, iClubId)
   }
 
+  // Safety net if middleware could not resolve nav / membership.
   if (pageIsMembersOnly && (!isLoggedIn || !canAccessClub)) {
     notFound()
   }

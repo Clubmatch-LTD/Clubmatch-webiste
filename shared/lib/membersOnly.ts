@@ -76,3 +76,13 @@ export async function fetchMyClubs(token: string) {
     return []
   }
 }
+
+/** True when the request has a token and that user belongs to the club. */
+export async function userCanAccessClub(
+  token: string | null | undefined,
+  iClubId: string | undefined
+) {
+  if (!hasAuthToken(token) || !iClubId) return false
+  const clubs = await fetchMyClubs(token!.trim())
+  return userHasClubAccess(clubs, iClubId)
+}

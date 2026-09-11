@@ -3,12 +3,10 @@ import { getPageMetadata, getPageSeo } from '@/shared/lib/seo'
 import "../assets/scss/global.scss";
 import { FONT_VAR_BY_KEY, normalizeFontKey } from '@/shared/theme/font-constants'
 import { getSelectedFontVariableClasses } from '@/app/fonts'
-import Preloader from "@/shared/ui/loaders/Preloader";
 import Providers from "./providers";
 
 const defaultMetadata = {
   title: 'Clubmatch',
-  description: 'Clubmatch',
 }
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -60,7 +58,6 @@ export default async function RootLayout({
         `}</style>
       </head>
       <body className="min-h-full flex flex-col" suppressHydrationWarning>
-        <Preloader />
         <Providers googleAnalyticsId={sGoogleAnalyticsId}>
           {children}
         </Providers>

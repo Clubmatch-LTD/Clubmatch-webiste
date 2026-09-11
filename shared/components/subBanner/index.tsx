@@ -1,6 +1,9 @@
+import Image from 'next/image'
 import MyImage from '@/shared/ui/myImage'
 import ClubMatch from '@/assets/images/club-2.png'
 import { withS3Prefix } from '@/shared/utils/seo-utils'
+
+const HERO_SIZES = '(max-width: 768px) 100vw, (max-width: 1280px) 100vw, 1400px'
 
 function SubBanner({
   title,
@@ -18,13 +21,14 @@ function SubBanner({
   return (
     <section className="main-bg pt-[200px] pb-16 mxs:pt-28 mxs:pb-10 flex flex-col gap-8 items-center main-shape bg-black relative min-h-[720px] mxs:min-h-[400px] overflow-hidden after:absolute after:inset-0 after:bg-black/40 after:z-10">
       {finalBg && (
-        <MyImage
+        <Image
           src={finalBg}
-          className="w-full h-full max-h-[100vh] object-cover object-top absolute top-0 left-0"
           alt="background"
-          height={1920}
-          width={1080}
+          fill
           priority
+          fetchPriority="high"
+          sizes={HERO_SIZES}
+          className="object-cover object-top"
         />
       )}
       <div className="absolute inset-0 main-bg z-10 w-full h-full opacity-25" />

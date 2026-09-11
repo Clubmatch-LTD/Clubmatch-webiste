@@ -14,7 +14,9 @@ function VideoSection({ homeData }: { homeData?: any }) {
   const { mediaAllowed, openBanner, setChooseOpen } = useCookieConsent()
 
   const sTitle = asString(homeData?.sTitle)
-  const sLearnMoreUrl = asString(homeData?.sLearnMoreUrl)
+  const rawLearnMoreUrl = asString(homeData?.sLearnMoreUrl)
+  const sLearnMoreUrl =
+    rawLearnMoreUrl && /^https?:\/\/\S+$/i.test(rawLearnMoreUrl) ? rawLearnMoreUrl : ''
   const { embedUrl, directUrl } = resolveVideoSource(homeData)
   const hasVideo = !!(embedUrl || directUrl)
   const youtubeId = embedUrl ? getYouTubeVideoId(embedUrl) : null

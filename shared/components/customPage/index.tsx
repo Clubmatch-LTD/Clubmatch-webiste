@@ -40,7 +40,7 @@ function CustomPage({
     return (
         <>
             <SubBanner
-                title={oHeader?.sTitle || (publishedSeo?.title as string)}
+                title={oHeader?.sTitle || (publishedSeo?.sClubName as string)}
                 description={oHeader?.sSubtitle}
                 bgImage={oHeader?.oHeaderImage?.sFileUrl}
             />

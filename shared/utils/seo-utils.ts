@@ -62,6 +62,17 @@ export function pickFirstString(
   return undefined
 }
 
+/** Site settings URL segment → display name, e.g. forres-tennis-club → Forres Tennis Club */
+export function formatUrlSegmentName(segment: unknown): string {
+  const value = asString(segment)
+  if (!value) return ''
+  return value
+    .split(/[-_]+/)
+    .filter(Boolean)
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+    .join(' ')
+}
+
 export function getVideoEmbedUrl(url: unknown): string | null {
   const value = asString(url)
   if (!value) return null

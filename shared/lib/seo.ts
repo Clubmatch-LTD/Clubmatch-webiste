@@ -12,10 +12,18 @@ import {
   withS3Prefix,
   asKeywords,
   toHeaderValue,
-  pickFirstString
+  pickFirstString,
+  formatUrlSegmentName
 } from '../utils/seo-utils'
 
-export { asString, withS3Prefix, asKeywords, toHeaderValue, pickFirstString }
+export {
+  asString,
+  withS3Prefix,
+  asKeywords,
+  toHeaderValue,
+  pickFirstString,
+  formatUrlSegmentName
+}
 
 /** Internal helper to avoid header injection duplication in middleware fetchers */
 function getForwardedHeaders(headers: Headers): Record<string, string> {
@@ -177,6 +185,9 @@ export async function fetchPublishedClubWebsiteDesign({
     }
 
     // Site Settings
+    const sUrlSegment = asString(oSiteSettings?.oAddress?.sUrlSegment)
+    if (sUrlSegment) result.sUrlSegment = sUrlSegment
+
     if (oLogoSettings?.bHideLtaFooterLogo !== undefined)
       result.bHideLtaFooterLogo = String(!!oLogoSettings.bHideLtaFooterLogo)
     if (oLogoSettings?.bHideClubmatchFooterLogo !== undefined)
@@ -291,12 +302,21 @@ export function getSeoPayload(
       design?.sClubMonoLogo
   )
   const keywords = asKeywords(seo?.keywords ?? oSeo?.keywords)
+  // Club name for empty headers comes from Site settings URL (oAddress.sUrlSegment)
+  const sUrlSegment =
+    asString(seo?.oSiteSettings?.oAddress?.sUrlSegment) ||
+    asString(design?.sUrlSegment) ||
+    asString(sSiteSegment)
+  const sClubName = formatUrlSegmentName(sUrlSegment)
+
   return {
     ...seo,
     title,
     description,
     keywords,
     image,
+    sClubName,
+    sUrlSegment,
     oDesign: design,
     aMenu: navigation?.aMenu || [],
     sSiteSegment,

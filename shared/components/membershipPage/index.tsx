@@ -116,7 +116,7 @@ export default function MembershipPage({
             {bShowClubmatchButton && (
               <Button
                 className="mxs:w-full"
-                href={`${PORTAL_URL}/settings/my-clubs-details/${iClubId}?openManage=1` as any}
+                href={`${PORTAL_URL}/settings/my-clubs-details/${iClubId}` as any}
                 target="_blank"
                 rel="noopener noreferrer"
               >

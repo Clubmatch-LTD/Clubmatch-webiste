@@ -116,7 +116,7 @@ export default function BookingPage({
             {bShowClubmatchButton && (
             <Button
               className="mxs:w-full"
-              href={`${PORTAL_URL}/court-availability?iClubId=${iClubId}` as any}
+              href={`${PORTAL_URL}/court-availability` as any}
               target="_blank"
               rel="noopener noreferrer"
             >

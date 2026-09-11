@@ -9,6 +9,7 @@ import CourtAvailabilityCalendar from '@/shared/components/booking/courtAvailabi
 import EmptyState from '@/shared/components/emptyState'
 import { getCourtsByClubIdAction, getCourtAvailabilityByClubIdAction } from '@/api/club-website/club-website.actions'
 import type { CourtAvailabilityData } from '@/shared/components/booking/courtAvailabilityCalendar/utils'
+import { PORTAL_URL } from '@/shared/constant'
 
 type PublishedSeo = Record<string, unknown> & {
   iClubId?: string
@@ -115,9 +116,7 @@ export default function BookingPage({
             {bShowClubmatchButton && (
             <Button
               className="mxs:w-full"
-              href={
-                'https://portal.clubmatch.co.uk/court-availability' as any
-              }
+              href={`${PORTAL_URL}/court-availability?iClubId=${iClubId}` as any}
               target="_blank"
               rel="noopener noreferrer"
             >

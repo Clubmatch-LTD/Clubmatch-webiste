@@ -3,8 +3,12 @@ export const NEXT_PUBLIC_ENV = process.env.NEXT_PUBLIC_ENV || 'development'
 export const NEXT_PUBLIC_DOMAIN =
   process.env.NEXT_PUBLIC_DOMAIN ||
   'http://clubmatch-user-dev.s3-website-eu-west-1.amazonaws.com'
+/** Clubmatch portal base URL — change per env branch (dev / staging / production) */
+export const PORTAL_URL = 'http://clubmatch-user-dev.s3-website-eu-west-1.amazonaws.com'
+// staging: 'https://…stag…'
+// production: 'https://portal.clubmatch.co.uk'
 export const NEXT_PUBLIC_S3_PREFIX =
-  process.env.NEXT_PUBLIC_S3_PREFIX ||
+  process.env.NEXT_PUBLIC_S3_PREFIX ||  
   'https://clubmatch-media.s3.eu-west-1.amazonaws.com'
 export const NEXT_PUBLIC_API_URL =
   process.env.NEXT_PUBLIC_API_URL || 'http://52.213.170.31:5200/api/'

@@ -10,7 +10,7 @@ import MembershipCard, {
 } from '@/shared/components/membershipPage/membershipCard'
 import { getMembershipPlansByClubIdAction } from '@/api/club-website/club-website.actions'
 import Loader from '@/shared/ui/loaders'
-
+import { PORTAL_URL } from '@/shared/constant'
 
 type PublishedSeo = Record<string, unknown> & {
   iClubId?: string
@@ -116,7 +116,7 @@ export default function MembershipPage({
             {bShowClubmatchButton && (
               <Button
                 className="mxs:w-full"
-                href={'https://portal.clubmatch.co.uk/settings/my-clubs' as any}
+                href={`${PORTAL_URL}/settings/my-clubs-details/${iClubId}?openManage=1` as any}
                 target="_blank"
                 rel="noopener noreferrer"
               >
@@ -140,7 +140,7 @@ export default function MembershipPage({
                 <MembershipCard
                   key={plan._id}
                   plan={plan}
-                  joinHref={'https://portal.clubmatch.co.uk/settings/my-clubs' as any}
+                  joinHref={`${PORTAL_URL}/settings/my-clubs-details/${iClubId}?iPlanId=${plan._id}` as any}
                 />
               ))}
 

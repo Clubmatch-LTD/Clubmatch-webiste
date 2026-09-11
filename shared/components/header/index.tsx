@@ -8,7 +8,7 @@ import IconMenu from "@/shared/icon/menu"
 import IconClose from "@/shared/icon/close"
 import IconChevronDown from "@/shared/icon/chevronDown"
 import Link from "next/link"
-import { NEXT_PUBLIC_DOMAIN } from "@/shared/constant"
+import { PORTAL_URL } from "@/shared/constant"
 
 type NavMenuItem = {
     sSlug: string
@@ -101,7 +101,7 @@ function Header({
     }, [pathname])
 
     const useSolidHeaderBg = isMenuOpen || isScrolled
-    const portalBase = NEXT_PUBLIC_DOMAIN.replace(/\/$/, '')
+    const portalBase = PORTAL_URL.replace(/\/$/, '')
 
     return (
         <header

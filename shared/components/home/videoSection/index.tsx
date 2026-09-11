@@ -6,9 +6,9 @@ import {
   getYouTubePosterUrl,
   getYouTubeVideoId,
   resolveVideoSource,
+  toYouTubeNoCookieEmbed,
 } from '@/shared/utils/seo-utils'
 import { useCookieConsent } from '@/shared/components/cookieConsent/CookieConsentProvider'
-import CustomVideoPlayer from '@/shared/components/customVideoPlayer'
 
 function VideoSection({ homeData }: { homeData?: any }) {
   const { mediaAllowed, openBanner, setChooseOpen } = useCookieConsent()
@@ -21,6 +21,13 @@ function VideoSection({ homeData }: { homeData?: any }) {
   const posterUrl = youtubeId ? getYouTubePosterUrl(youtubeId) : null
   const needsMediaConsent = !!embedUrl
   const canPlayEmbed = !needsMediaConsent || mediaAllowed
+
+  const iframeSrc =
+    canPlayEmbed && embedUrl
+      ? embedUrl.includes('youtube')
+        ? toYouTubeNoCookieEmbed(embedUrl)
+        : embedUrl
+      : null
 
   if (!sTitle && !sLearnMoreUrl && !hasVideo) return null
 
@@ -49,14 +56,23 @@ function VideoSection({ homeData }: { homeData?: any }) {
       )}
       {hasVideo ? (
         <div className="w-full mxs:pt-[55%] msm:h-[777px] relative z-10 mx-auto rounded-t-[48px] bg-black after:absolute after:left-0 after:bottom-0 after:bg-video-gradient after:w-full after:h-[200px] mxs:after:h-20 overflow-hidden">
-          {canPlayEmbed || directUrl ? (
-            <CustomVideoPlayer
-              embedUrl={canPlayEmbed ? embedUrl : null}
-              directUrl={directUrl}
-              posterUrl={posterUrl}
+          {iframeSrc ? (
+            <iframe
+              src={iframeSrc}
               title={sTitle || 'Video'}
+              className="w-full h-full absolute inset-0 border-0"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+              allowFullScreen
             />
-          ) : (
+          ) : directUrl ? (
+            <video
+              className="w-full h-full absolute inset-0 object-cover rounded-t-[48px] mxs:rounded-t-2xl"
+              controls
+              playsInline
+              preload="metadata"
+              src={directUrl}
+            />
+          ) : needsMediaConsent ? (
             <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 px-4 text-center">
               {posterUrl ? (
                 // eslint-disable-next-line @next/next/no-img-element
@@ -79,7 +95,7 @@ function VideoSection({ homeData }: { homeData?: any }) {
                 </button>
               </div>
             </div>
-          )}
+          ) : null}
         </div>
       ) : null}
     </section>
